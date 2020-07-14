@@ -1,6 +1,6 @@
-package com.tydic.auth.util;
+package com.auth.util;
 
-import com.tydic.common.biz.entity.AuthQueryEntity;
+import com.auth.entity.AuthQueryEntity;
 
 /**
  * @author wangdejun
@@ -9,7 +9,7 @@ import com.tydic.common.biz.entity.AuthQueryEntity;
  */
 public class AuthHelper {
 
-    private static final ThreadLocal<AuthQueryInfo> LOCAL_CUR_AUTHINFO = new ThreadLocal<>();
+    private static final ThreadLocal<AuthQueryInfo> LOCAL_CUR_AUTHINFO = new ThreadLocal();
 
     public static void setCurSearch(AuthQueryInfo authQueryInfo) {
         LOCAL_CUR_AUTHINFO.set(authQueryInfo);
@@ -40,11 +40,11 @@ public class AuthHelper {
      * @param authQueryEntity
      */
     public static AuthQueryInfo refreshAuthHelper(AuthQueryEntity authQueryEntity) {
-        if(LOCAL_CUR_AUTHINFO.get() != null){
-            synchronized (LOCAL_CUR_AUTHINFO.get()){
+        if (LOCAL_CUR_AUTHINFO.get() != null) {
+            synchronized (LOCAL_CUR_AUTHINFO.get()) {
                 return doRefreshAuthHelper(authQueryEntity);
             }
-        }else {
+        } else {
             return doRefreshAuthHelper(authQueryEntity);
         }
     }
@@ -54,7 +54,7 @@ public class AuthHelper {
         AuthHelper.setCurSearch(authQueryInfo);
         //设置权限sql where条件
         if (authQueryInfo.getAuthQuery() != null && authQueryEntity.getAuthQuery()) {
-            authQueryEntity.setAuthSql(MyBatisAuthUtils.getAuthSqlWhere(null));
+            authQueryEntity.setAuthSql(com.tydic.auth.util.MyBatisAuthUtils.getAuthSqlWhere(null));
         }
         return authQueryInfo;
     }
@@ -64,14 +64,8 @@ public class AuthHelper {
         authQueryInfo.setAutoAppendAuth(entityWithParam.getAutoAppendAuth());
         authQueryInfo.setAuthQuery(entityWithParam.getAuthQuery());
         authQueryInfo.setAuthTableAlias(entityWithParam.getAuthTableAlias());
-        if (entityWithParam.getBizBaseAccount() != null) {
-            if ("1".equals(entityWithParam.getBizBaseAccount().getIsSuperAdmin())) {
-                authQueryInfo.setSuperAdmin(true);
-            }
-            authQueryInfo.setCityIdDataScope(entityWithParam.getBizBaseAccount().getCityIdDataScope());
-            authQueryInfo.setAuthColumn(entityWithParam.getAuthColumn());
-            authQueryInfo.setAuthColumnType(entityWithParam.getAuthColumnType());
-        }
+        authQueryInfo.setAuthColumn(entityWithParam.getAuthColumn());
+        authQueryInfo.setAuthColumnType(entityWithParam.getAuthColumnType());
         return authQueryInfo;
     }
 

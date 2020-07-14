@@ -1,4 +1,4 @@
-package com.tydic.auth.plugin;
+package com.auth.plugin;
 
 import com.tydic.auth.util.MyBatisAuthUtils;
 import org.apache.ibatis.executor.statement.RoutingStatementHandler;

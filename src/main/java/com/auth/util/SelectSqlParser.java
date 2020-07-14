@@ -1,6 +1,6 @@
-package com.tydic.auth.util;
+package com.auth.util;
 
-import cn.hutool.core.util.StrUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -136,7 +136,7 @@ public class SelectSqlParser {
         SqlSegment whereSqlSegment = segments.get(2);
         String parsedSqlSegment = whereSqlSegment.getParsedSqlSegment();
         SqlSegment sqlSegment = new SqlSegment("( where | on | having )(.+)( group by | order by | " + END_SIGNAL + ")", "( and | or )");
-        if (StrUtil.isBlank(parsedSqlSegment)) {
+        if (StringUtils.isBlank(parsedSqlSegment)) {
             sqlSegment.parse(" where " + whereSql + " " + END_SIGNAL);
         } else {
             sqlSegment.parse(parsedSqlSegment + " and " + "(" + whereSql + ") " + END_SIGNAL);

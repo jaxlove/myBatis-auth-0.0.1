@@ -1,9 +1,8 @@
-package com.tydic.auth.util;
+package com.auth.util;
 
-
-import cn.hutool.core.lang.Pair;
 
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -36,7 +35,7 @@ public class AuthQueryInfo {
     /**
      * 权限查询数据库字段，可以为多个，为空时默认为<city_id,Integer>
      */
-    private List<Pair<String,Class>> authColumn;
+    private List<Properties> authColumn;
 
     /**
      * 权限查询数据库多个字段时，字段的判断方式，null为or关系
@@ -66,11 +65,11 @@ public class AuthQueryInfo {
         this.authTableAlias = authTableAlias;
     }
 
-    public List<Pair<String, Class>> getAuthColumn() {
+    public List<Properties> getAuthColumn() {
         return authColumn;
     }
 
-    public void setAuthColumn(List<Pair<String, Class>> authColumn) {
+    public void setAuthColumn(List<Properties> authColumn) {
         this.authColumn = authColumn;
     }
 
