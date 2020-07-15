@@ -54,7 +54,7 @@ public class AuthHelper {
         AuthHelper.setCurSearch(authQueryInfo);
         //设置权限sql where条件
         if (authQueryInfo.getAuthQuery() != null && authQueryEntity.getAuthQuery()) {
-            authQueryEntity.setAuthSql(com.tydic.auth.util.MyBatisAuthUtils.getAuthSqlWhere(null));
+            authQueryEntity.setAuthSql(MyBatisAuthUtils.getAuthSqlWhere(null));
         }
         return authQueryInfo;
     }

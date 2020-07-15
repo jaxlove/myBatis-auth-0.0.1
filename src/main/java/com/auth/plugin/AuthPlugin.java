@@ -1,6 +1,6 @@
 package com.auth.plugin;
 
-import com.tydic.auth.util.MyBatisAuthUtils;
+import com.auth.util.MyBatisAuthUtils;
 import org.apache.ibatis.executor.statement.RoutingStatementHandler;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
@@ -38,6 +38,7 @@ public class AuthPlugin implements Interceptor {
 
     @Override
     public void setProperties(Properties properties) {
+
     }
 
     private void setAuthBoundSql(Object handler) {

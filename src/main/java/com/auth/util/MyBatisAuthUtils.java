@@ -2,6 +2,7 @@ package com.auth.util;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.type.TypeAliasRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +54,7 @@ public class MyBatisAuthUtils {
         }
         String authSql;
         //权限字段
-        List<Properties> authColumn = CollectionUtils.isEmpty(curSearchInfo.getAuthColumn()) ? Arrays.asList(new Pair<>("CITY_ID", Integer.class)) : curSearchInfo.getAuthColumn();
+        List<Properties> authColumn = curSearchInfo.getAuthColumn();
         if (isPageHelperSql(sql)) {
             sql = splitPageHelperSql(sql);
         }
@@ -94,7 +95,7 @@ public class MyBatisAuthUtils {
                     if (t.getColumnAlias().indexOf("*") > -1) {
                         return true;
                     }
-                    if (t.getColumnAlias().equalsIgnoreCase(pair.getKey())) {
+                    if (t.getColumnAlias().equalsIgnoreCase(pair.getProperty("column"))) {
                         return true;
                     }
                 }
@@ -189,7 +190,7 @@ public class MyBatisAuthUtils {
             return "(0 = 1)";
         }
         //权限字段
-        List<Properties> authColumnNames = CollectionUtils.isEmpty(curSearchInfo.getAuthColumn()) ? Arrays.asList(new Pair<>("CITY_ID", Integer.class)) : curSearchInfo.getAuthColumn();
+        List<Properties> authColumnNames = curSearchInfo.getAuthColumn();
         //判断当前sql查询出来的字段，是否包含任一权限字段或者x.*,如果包含，则将原始sql包在一起，外部加上${AUTH_ALIAS}再加上权限条件,如果没有，则直接加上权限条件，再加上${AUTH_ALIAS}
         AuthColumnType authColumnType = "1".equals(curSearchInfo.getAuthColumnType()) ? AuthColumnType.AND : AuthColumnType.OR;
         Set<Integer> authValue = curSearchInfo.getCityIdDataScope();
@@ -200,17 +201,19 @@ public class MyBatisAuthUtils {
             String singleColumnAuth = null;
             if (authValue.contains(0)) {
 //                 如果，true，即使权限为所有，也进行权限字段拼接 eg：nvl(a.city_id,-999999) = nvl(a.city_id,-999999)
-                Boolean authColumnCheck = PropertityUtil.getProperty("authColumnCheck", Boolean.class);
+                //wdjtodo 待修改
+                Boolean authColumnCheck = Boolean.getBoolean(authColumn.getProperty("authColumnCheck"));
                 if (authColumnCheck != null && authColumnCheck) {
                     singleColumnAuth = " nvl(" + getAliasAndColumnName(tableNameAlias, authColumn) + ",-999999) = nvl(" + getAliasAndColumnName(tableNameAlias, authColumn) + ",-999999)";
                 }
             } else {
+                Class jdbcType = new TypeAliasRegistry().resolveAlias(authColumn.getProperty("jdbcType"));
                 singleColumnAuth = getAliasAndColumnName(tableNameAlias, authColumn) + " in (";
-                if (Number.class.isAssignableFrom(authColumn.getValue())) {
-                    singleColumnAuth += CollectionUtils.join(authValue, ",");
-                } else if (authColumn.getValue() == String.class) {
+                if (Number.class.isAssignableFrom(jdbcType)) {
+                    singleColumnAuth += StringUtils.join(authValue.toArray(), ",");
+                } else if (jdbcType == String.class) {
                     List<String> authValueStrList = authValue.stream().map(t -> "'" + t + "'").collect(Collectors.toList());
-                    singleColumnAuth += CollectionUtils.join(authValueStrList, ",");
+                    singleColumnAuth += StringUtils.join(authValueStrList, ",");
                 } else {
 
                 }
@@ -227,12 +230,12 @@ public class MyBatisAuthUtils {
         if (authAuthList.size() == 1) {
             return "(" + authAuthList.get(0) + ")";
         } else {
-            return "(" + CollectionUtils.join(authAuthList, " " + authColumnType.operator + " ") + ")";
+            return "(" + StringUtils.join(authAuthList, " " + authColumnType.operator + " ") + ")";
         }
     }
 
     private static String getAliasAndColumnName(String alias, Properties columnInfo) {
-        return StringUtils.isBlank(alias) ? columnInfo.getKey() : alias + "." + columnInfo.getKey();
+        return StringUtils.isBlank(alias) ? columnInfo.getProperty("column") : alias + "." + columnInfo.getProperty("column");
     }
 
     enum AuthColumnType {
