@@ -5,6 +5,6 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface TestMapper {
 
-    void test(String name);
+    int test(String name);
 
 }

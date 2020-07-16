@@ -1,0 +1,50 @@
+server:
+  port: 9001
+  maxHttpHeadSize: 65536
+
+spring:
+  application:
+    name: mybatis-auth
+  profiles:
+    active: dev
+  datasource:
+    driver-class-name: oracle.jdbc.OracleDriver
+    url: ENC(wCjUiZoVZjXI5AfkrYItRrAZcrdI6+HkwqXl21aSkf94Wucj1+AkNkRQ3ZbrXyhCPJn8QhxY69k=)
+    filters: stat
+    initialSize: 20
+    username: ENC(gm0TS4zPG/mBLOHR+z7hgQ==)
+    password: ENC(uuE61WcNgkV6Alvq0V7rP18sXaanpdzH)
+    maxActive: 20
+    maxWait: 2000
+    minEvictableIdleTimeMillis: 300000
+    minIdle: 20
+    testOnBorrow: false
+    testOnReturn: false
+    testWhileIdle: true
+    timeBetweenEvictionRunsMillis: 60000
+    validationQuery: select 1 from dual
+
+#mybatis 配置
+mybatis:
+  config-location: classpath:mybatis-config.xml
+  mapper-locations: classpath*:mapper/**/*.xml
+
+#通用mapper 配置
+mapper:
+  mappers:
+    - tk.mybatis.mapper.common.Mapper
+    - com.tydic.common.BaseMapper
+  not-empty: false
+  before: true
+  style: camelhumpandlowercase
+
+
+
+
+
+
+
+
+
+
+

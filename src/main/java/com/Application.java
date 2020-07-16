@@ -1,7 +1,9 @@
 package com;
 
+import com.mybatis.dao.TestMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
 /**
  * @author wangdejun
@@ -12,7 +14,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class Application {
 
     public static void main(String[] args) {
-        SpringApplication.run(Application.class);
+        ConfigurableApplicationContext run = SpringApplication.run(Application.class);
+        TestMapper bean = run.getBean(TestMapper.class);
+        System.out.println(bean.test("哈哈"));
     }
 
 }
