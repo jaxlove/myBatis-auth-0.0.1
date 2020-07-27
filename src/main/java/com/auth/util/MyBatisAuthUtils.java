@@ -24,12 +24,17 @@ public class MyBatisAuthUtils {
 
     private static final String AUTH_TABLE_ALIAS = "AUTH_TABLE_ALIAS";
 
+    private static Properties defaultProperties = null;
+
     //分页sql的前面的sql
     private static ThreadLocal<String> pageHelperPreSqlThread = ThreadLocal.withInitial(() -> "");
 
     //分页sql的后面的sql
     private static ThreadLocal<String> pageHelperSufSqlThread = ThreadLocal.withInitial(() -> "");
 
+    public static void setDefaultProperties(Properties properties) {
+        defaultProperties = properties;
+    }
 
     public static String getAuthSql(String sql) {
         //没有权限查询信息，权限查询为空或者为false,自动拼接权限sql为空或者false，返回原sql
@@ -45,11 +50,11 @@ public class MyBatisAuthUtils {
             return sql;
         }
         //超管，设置为全部数据权限
-        if (curSearchInfo.isSuperAdmin()) {
-            curSearchInfo.setCityIdDataScope(new HashSet(Arrays.asList(0)));
+        if (curSearchInfo.isAllDataSign()) {
+            curSearchInfo.setDataScope(new HashSet(Arrays.asList(0)));
         }
         //无数据权限，返回空
-        if (curSearchInfo.getCityIdDataScope() == null || curSearchInfo.getCityIdDataScope().isEmpty()) {
+        if (curSearchInfo.getDataScope() == null || curSearchInfo.getDataScope().isEmpty()) {
             return EMPTY_SQL;
         }
         String authSql;
@@ -182,18 +187,18 @@ public class MyBatisAuthUtils {
             return null;
         }
         //超管，设置为全部数据权限
-        if (curSearchInfo.isSuperAdmin()) {
-            curSearchInfo.setCityIdDataScope(new HashSet<>(Arrays.asList(0)));
+        if (curSearchInfo.isAllDataSign()) {
+            curSearchInfo.setDataScope(new HashSet<>(Arrays.asList(0)));
         }
         //无数据权限，返回空
-        if (CollectionUtils.isEmpty(curSearchInfo.getCityIdDataScope())) {
+        if (CollectionUtils.isEmpty(curSearchInfo.getDataScope())) {
             return "(0 = 1)";
         }
         //权限字段
         List<Properties> authColumnNames = curSearchInfo.getAuthColumn();
         //判断当前sql查询出来的字段，是否包含任一权限字段或者x.*,如果包含，则将原始sql包在一起，外部加上${AUTH_ALIAS}再加上权限条件,如果没有，则直接加上权限条件，再加上${AUTH_ALIAS}
-        AuthColumnType authColumnType = "1".equals(curSearchInfo.getAuthColumnType()) ? AuthColumnType.AND : AuthColumnType.OR;
-        Set<Integer> authValue = curSearchInfo.getCityIdDataScope();
+        RelationTypeEnum relationTypeEnum = curSearchInfo.getRelationTypeEnum();
+        Set<Integer> authValue = curSearchInfo.getDataScope();
         tableNameAlias = StringUtils.isBlank(tableNameAlias) ? curSearchInfo.getAuthTableAlias() : tableNameAlias;
         //获取所有的权限的条件
         List<String> authAuthList = new ArrayList<>();
@@ -230,22 +235,12 @@ public class MyBatisAuthUtils {
         if (authAuthList.size() == 1) {
             return "(" + authAuthList.get(0) + ")";
         } else {
-            return "(" + StringUtils.join(authAuthList, " " + authColumnType.operator + " ") + ")";
+            return "(" + StringUtils.join(authAuthList, " " + relationTypeEnum.getOperator() + " ") + ")";
         }
     }
 
     private static String getAliasAndColumnName(String alias, Properties columnInfo) {
         return StringUtils.isBlank(alias) ? columnInfo.getProperty("column") : alias + "." + columnInfo.getProperty("column");
-    }
-
-    enum AuthColumnType {
-
-        AND("and"), OR("or");
-        private String operator;
-
-        AuthColumnType(String operator) {
-            this.operator = operator;
-        }
     }
 
 

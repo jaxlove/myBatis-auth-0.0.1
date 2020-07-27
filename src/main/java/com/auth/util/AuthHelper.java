@@ -65,7 +65,7 @@ public class AuthHelper {
         authQueryInfo.setAuthQuery(entityWithParam.getAuthQuery());
         authQueryInfo.setAuthTableAlias(entityWithParam.getAuthTableAlias());
         authQueryInfo.setAuthColumn(entityWithParam.getAuthColumn());
-        authQueryInfo.setAuthColumnType(entityWithParam.getAuthColumnType());
+        authQueryInfo.setRelationTypeEnum(entityWithParam.getRelationTypeEnum());
         return authQueryInfo;
     }
 

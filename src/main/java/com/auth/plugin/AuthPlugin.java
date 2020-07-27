@@ -38,7 +38,7 @@ public class AuthPlugin implements Interceptor {
 
     @Override
     public void setProperties(Properties properties) {
-
+        MyBatisAuthUtils.setDefaultProperties(properties);
     }
 
     private void setAuthBoundSql(Object handler) {

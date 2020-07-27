@@ -1,6 +1,8 @@
 package com.auth.entity;
 
 
+import com.auth.util.RelationTypeEnum;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Properties;
@@ -33,7 +35,7 @@ public class AuthQueryEntity implements Serializable {
      * 0：or
      * 1：and
      */
-    private String authColumnType;
+    private RelationTypeEnum relationTypeEnum;
 
     /**
      * 权限表查询时的别名
@@ -43,7 +45,7 @@ public class AuthQueryEntity implements Serializable {
     /**
      * 拼接好的权限sql
      * 全部权限为 null
-     * 格式为：(authTableAlias.authColumn in (bizBaseAccount.cityIdDataScope) authColumnType authTableAlias.authColumn in (bizBaseAccount.cityIdDataScope))
+     * 格式为：(authTableAlias.authColumn in (dataScope) relationTypeEnum.operate authTableAlias.authColumn in (dataScope))
      */
     private String authSql;
 
@@ -79,12 +81,12 @@ public class AuthQueryEntity implements Serializable {
         this.authColumn = authColumn;
     }
 
-    public String getAuthColumnType() {
-        return authColumnType;
+    public RelationTypeEnum getRelationTypeEnum() {
+        return relationTypeEnum;
     }
 
-    public void setAuthColumnType(String authColumnType) {
-        this.authColumnType = authColumnType;
+    public void setRelationTypeEnum(RelationTypeEnum relationTypeEnum) {
+        this.relationTypeEnum = relationTypeEnum;
     }
 
     public Boolean getAutoAppendAuth() {

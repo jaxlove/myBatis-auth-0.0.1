@@ -13,14 +13,14 @@ import java.util.Set;
 public class AuthQueryInfo {
 
     /**
-     * 是否为超级管理员，是，不需要权限
+     * 是否查询全部数据
      */
-    private boolean isSuperAdmin;
+    private boolean allDataSign = false;
 
     /**
-     * 地市权限
+     * 数据权限
      */
-    private Set<Integer> cityIdDataScope;
+    private Set dataScope;
 
     /**
      * 是否自动拼接权限sql
@@ -33,7 +33,7 @@ public class AuthQueryInfo {
     private Boolean authQuery;
 
     /**
-     * 权限查询数据库字段，可以为多个，为空时默认为<city_id,Integer>
+     * 权限查询数据库字段，可以为多个
      */
     private List<Properties> authColumn;
 
@@ -42,7 +42,7 @@ public class AuthQueryInfo {
      * 0：or
      * 1：and
      */
-    private String authColumnType;
+    private RelationTypeEnum relationTypeEnum;
 
     /**
      * 权限表查询时的别名
@@ -73,28 +73,28 @@ public class AuthQueryInfo {
         this.authColumn = authColumn;
     }
 
-    public String getAuthColumnType() {
-        return authColumnType;
+    public RelationTypeEnum getRelationTypeEnum() {
+        return relationTypeEnum;
     }
 
-    public void setAuthColumnType(String authColumnType) {
-        this.authColumnType = authColumnType;
+    public void setRelationTypeEnum(RelationTypeEnum relationTypeEnum) {
+        this.relationTypeEnum = relationTypeEnum;
     }
 
-    public Set<Integer> getCityIdDataScope() {
-        return cityIdDataScope;
+    public Set getDataScope() {
+        return dataScope;
     }
 
-    public boolean isSuperAdmin() {
-        return isSuperAdmin;
+    public boolean isAllDataSign() {
+        return allDataSign;
     }
 
-    public void setSuperAdmin(boolean superAdmin) {
-        isSuperAdmin = superAdmin;
+    public void setAllDataSign(boolean allDataSign) {
+        this.allDataSign = allDataSign;
     }
 
-    public void setCityIdDataScope(Set<Integer> cityIdDataScope) {
-        this.cityIdDataScope = cityIdDataScope;
+    public void setDataScope(Set dataScope) {
+        this.dataScope = dataScope;
     }
 
     public Boolean getAutoAppendAuth() {
