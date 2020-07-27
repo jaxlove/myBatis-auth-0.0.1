@@ -3,27 +3,15 @@ package com.auth.entity;
 
 import com.auth.util.RelationTypeEnum;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Properties;
 
 /**
  * @author wangdejun
- * @description: 权限查询实体类
+ * @description: 简单权限查询信息
  * @date 2020/2/22 12:04
  */
-public class AuthQueryEntity implements Serializable {
-
-
-    /**
-     * 是否自动拼接权限sql
-     */
-    private Boolean autoAppendAuth = true;
-
-    /**
-     * 是否为权限查询（为false，则不会自动拼接权限sql，且不会设置authSql字段值）
-     */
-    private Boolean authQuery = true;
+public class SimpleAuthInfo extends BaseAuthInfo {
 
     /**
      * 权限查询数据库字段，可以为多个，为空时默认为city_id
@@ -42,28 +30,6 @@ public class AuthQueryEntity implements Serializable {
      */
     private String authTableAlias;
 
-    /**
-     * 拼接好的权限sql
-     * 全部权限为 null
-     * 格式为：(authTableAlias.authColumn in (dataScope) relationTypeEnum.operate authTableAlias.authColumn in (dataScope))
-     */
-    private String authSql;
-
-    public Boolean getAuthQuery() {
-        return authQuery;
-    }
-
-    public void setAuthQuery(Boolean authQuery) {
-        this.authQuery = authQuery;
-    }
-
-    public String getAuthSql() {
-        return authSql;
-    }
-
-    public void setAuthSql(String authSql) {
-        this.authSql = authSql;
-    }
 
     public String getAuthTableAlias() {
         return authTableAlias;
@@ -89,11 +55,4 @@ public class AuthQueryEntity implements Serializable {
         this.relationTypeEnum = relationTypeEnum;
     }
 
-    public Boolean getAutoAppendAuth() {
-        return autoAppendAuth;
-    }
-
-    public void setAutoAppendAuth(Boolean autoAppendAuth) {
-        this.autoAppendAuth = autoAppendAuth;
-    }
 }

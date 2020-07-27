@@ -1,6 +1,6 @@
 package com.auth.util;
 
-import com.auth.entity.AuthQueryEntity;
+import com.auth.entity.SimpleAuthInfo;
 
 /**
  * @author wangdejun
@@ -37,29 +37,29 @@ public class AuthHelper {
     /**
      * 刷新权限辅组类AuthHelper信息
      *
-     * @param authQueryEntity
+     * @param simpleAuthInfo
      */
-    public static AuthQueryInfo refreshAuthHelper(AuthQueryEntity authQueryEntity) {
+    public static AuthQueryInfo refreshAuthHelper(SimpleAuthInfo simpleAuthInfo) {
         if (LOCAL_CUR_AUTHINFO.get() != null) {
             synchronized (LOCAL_CUR_AUTHINFO.get()) {
-                return doRefreshAuthHelper(authQueryEntity);
+                return doRefreshAuthHelper(simpleAuthInfo);
             }
         } else {
-            return doRefreshAuthHelper(authQueryEntity);
+            return doRefreshAuthHelper(simpleAuthInfo);
         }
     }
 
-    private static AuthQueryInfo doRefreshAuthHelper(AuthQueryEntity authQueryEntity) {
-        AuthQueryInfo authQueryInfo = getAuthQueryInfo(authQueryEntity);
+    private static AuthQueryInfo doRefreshAuthHelper(SimpleAuthInfo simpleAuthInfo) {
+        AuthQueryInfo authQueryInfo = getAuthQueryInfo(simpleAuthInfo);
         AuthHelper.setCurSearch(authQueryInfo);
         //设置权限sql where条件
-        if (authQueryInfo.getAuthQuery() != null && authQueryEntity.getAuthQuery()) {
-            authQueryEntity.setAuthSql(MyBatisAuthUtils.getAuthSqlWhere(null));
+        if (authQueryInfo.getAuthQuery() != null && simpleAuthInfo.getAuthQuery()) {
+            simpleAuthInfo.setAuthSql(MyBatisAuthUtils.getAuthSqlWhere(null));
         }
         return authQueryInfo;
     }
 
-    private static AuthQueryInfo getAuthQueryInfo(AuthQueryEntity entityWithParam) {
+    private static AuthQueryInfo getAuthQueryInfo(SimpleAuthInfo entityWithParam) {
         AuthQueryInfo authQueryInfo = new AuthQueryInfo();
         authQueryInfo.setAutoAppendAuth(entityWithParam.getAutoAppendAuth());
         authQueryInfo.setAuthQuery(entityWithParam.getAuthQuery());
