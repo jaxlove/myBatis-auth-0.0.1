@@ -9,7 +9,7 @@ import com.auth.entity.SimpleAuthInfo;
  */
 public class AuthHelper {
 
-    private static final ThreadLocal<AuthQueryInfo> LOCAL_CUR_AUTHINFO = new ThreadLocal();
+    private static final ThreadLocal<AuthQueryInfo> LOCAL_CUR_AUTHINFO = new InheritableThreadLocal<>();
 
     public static void setCurSearch(AuthQueryInfo authQueryInfo) {
         LOCAL_CUR_AUTHINFO.set(authQueryInfo);
@@ -54,7 +54,8 @@ public class AuthHelper {
         AuthHelper.setCurSearch(authQueryInfo);
         //设置权限sql where条件
         if (authQueryInfo.getAuthQuery() != null && simpleAuthInfo.getAuthQuery()) {
-            simpleAuthInfo.setAuthSql(MyBatisAuthUtils.getAuthSqlWhere(null));
+            //todo 是否有必要
+//            simpleAuthInfo.setAuthSql(MyBatisAuthUtils.getAuthSqlWhere(null));
         }
         return authQueryInfo;
     }

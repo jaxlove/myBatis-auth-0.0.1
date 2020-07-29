@@ -7,7 +7,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 /**
  * @author wangdejun
- * @description: TODO description
+ * @description: test
  * @date 2020/7/15 19:39
  */
 @SpringBootApplication

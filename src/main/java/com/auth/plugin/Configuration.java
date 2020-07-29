@@ -15,7 +15,17 @@ public class Configuration {
     /**
      * 权限sql类型
      */
-    private static SqlType sqlType;
+    private static AuthType authType;
+
+    /**
+     * 数据库
+     */
+    private static String dialect = null;
+
+    /**
+     * 空sql
+     */
+    private static String EMPTY_SQL = null;
 
     /**
      * 是否自动拼接权限sql
@@ -47,24 +57,42 @@ public class Configuration {
     /**
      * 权限表查询时的别名
      */
-    private static String authTableAlias;
+    private static String authColumnTableAlias;
 
-    private static Boolean initSuccess = true;
+    private static boolean initSuccess = true;
 
-    public static SqlType getSqlType() {
-        return sqlType;
-    }
+    private static final String AUTH_TABLE_ALIAS = "AUTH_TABLE_ALIAS";
 
-    protected static void setSqlType(SqlType sqlType) {
-        Configuration.sqlType = sqlType;
-    }
-
-    public static Boolean getInitSuccess() {
+    public static boolean isInitSuccess() {
         return initSuccess;
     }
 
-    public static void setInitSuccess(Boolean initSuccess) {
+    public static void setInitSuccess(boolean initSuccess) {
         Configuration.initSuccess = initSuccess;
+    }
+
+    public static String getEmptySql() {
+        return EMPTY_SQL;
+    }
+
+    public static void setEmptySql(String emptySql) {
+        EMPTY_SQL = emptySql;
+    }
+
+    public static String getDialect() {
+        return dialect;
+    }
+
+    public static void setDialect(String dialect) {
+        Configuration.dialect = dialect;
+    }
+
+    public static AuthType getAuthType() {
+        return authType;
+    }
+
+    protected static void setAuthType(AuthType authType) {
+        Configuration.authType = authType;
     }
 
     public static Boolean getAutoAppendAuth() {
@@ -107,12 +135,12 @@ public class Configuration {
         Configuration.relationTypeEnum = relationTypeEnum;
     }
 
-    public static String getAuthTableAlias() {
-        return authTableAlias;
+    public static String getAuthColumnTableAlias() {
+        return authColumnTableAlias;
     }
 
-    public static void setAuthTableAlias(String authTableAlias) {
-        Configuration.authTableAlias = authTableAlias;
+    public static void setAuthColumnTableAlias(String authColumnTableAlias) {
+        Configuration.authColumnTableAlias = authColumnTableAlias;
     }
 }
 

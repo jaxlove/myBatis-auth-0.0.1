@@ -1,11 +1,14 @@
 package com.auth.util;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -17,18 +20,21 @@ import java.util.stream.Collectors;
  */
 public class SelectSqlParser {
 
+    private static final String BLANK = " ";
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    //sql结束标识
     private static final String END_SIGNAL = "ENDOFSQL";
 
     //原sql（不加pageHelper的sql） select的前缀
     private String originSqlPrefix;
 
+    //所有带引文括号的，都是为子查询，不做处理
     private List<SubSql> subSqlList = new ArrayList<>();
 
     // #sub_sql# 倆遍要加空格，否则可能出现 select * from() => select * from#sub_sql#，导致后面无法解析
-    private static final String SUB_SQL = " #sub_sql# ";
+    private static final String SUB_SQL = BLANK + "#sub_sql#" + BLANK;
 
     /**
      * 原始Sql语句
@@ -40,7 +46,7 @@ public class SelectSqlParser {
     /**
      * Sql语句片段
      */
-    protected List<SqlSegment> segments;
+    protected List<SqlSegment> segments = new ArrayList<>();
 
     /**
      * 构造函数，传入原始Sql语句，进行劈分。
@@ -49,10 +55,9 @@ public class SelectSqlParser {
      */
     public SelectSqlParser(String originalSql) {
         this.originalSql = replaceSubSql(originalSql);
-        //sql中，还包含这myBatis中的各种表达式，不能转为小写
-//        formatSql = this.originalSql.trim().toLowerCase().replaceAll("\\s{1,}", " ") + " " + END_SIGNAL;
-        formatSql = this.originalSql.trim().replaceAll("\\s{1,}", " ") + " " + END_SIGNAL;
-        segments = new ArrayList<>();
+        //注意sql中，可能包含着myBatis中的各种表达式
+        //去除多余空格
+        formatSql = this.originalSql.trim().replaceAll("\\s+", BLANK) + BLANK + END_SIGNAL;
         initializeSegments();
         splitSql2Segment();
     }
@@ -142,6 +147,32 @@ public class SelectSqlParser {
             sqlSegment.parse(parsedSqlSegment + " and " + "(" + whereSql + ") " + END_SIGNAL);
         }
         segments.set(2, sqlSegment);
+    }
+
+    /**
+     * 查询的sql 字段中，是否包含 传递的字段
+     * 带有 * 算作，或者全部字段，视为 包含
+     * todo * 未考虑别名
+     * @param authColumns
+     * @return
+     */
+    boolean hasColumn(List<Properties> authColumns) {
+        List<SelectSqlParser.SelectColumn> selectColumn = getSelectColumn();
+        if (CollectionUtils.isNotEmpty(selectColumn)) {
+            Optional<SelectColumn> hasAuthColumn = selectColumn.stream().filter(t -> {
+                for (Properties property : authColumns) {
+                    if (t.getColumnAlias().indexOf("*") > -1) {
+                        return true;
+                    }
+                    if (t.getColumnAlias().equalsIgnoreCase(property.getProperty("column"))) {
+                        return true;
+                    }
+                }
+                return false;
+            }).findAny();
+            return hasAuthColumn.isPresent();
+        }
+        return false;
     }
 
 

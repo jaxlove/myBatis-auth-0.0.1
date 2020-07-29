@@ -20,7 +20,8 @@ public class BaseAuthInfo {
     /**
      * 拼接好的权限sql
      * 全部权限为 null
-     * 格式为：(authTableAlias.authColumn in (dataScope) relationTypeEnum.operate authTableAlias.authColumn in (dataScope))
+     * simple格式为：(authTableAlias.authColumn in (dataScope) relationTypeEnum.operate authTableAlias.authColumn in (dataScope))
+     * complex格式为：()
      */
     private String authSql;
 

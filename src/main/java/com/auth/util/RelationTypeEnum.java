@@ -2,7 +2,7 @@ package com.auth.util;
 
 /**
  * @author wangdejun
- * @description: TODO description
+ * @description: 字段关系枚举
  * @date 2020/7/21 18:34
  */
 public enum RelationTypeEnum {

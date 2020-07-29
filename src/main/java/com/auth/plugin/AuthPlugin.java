@@ -6,6 +6,8 @@ import com.auth.util.MyBatisAuthUtils;
 import org.apache.ibatis.executor.statement.RoutingStatementHandler;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
+import org.apache.ibatis.mapping.MappedStatement;
+import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
@@ -29,6 +31,9 @@ public class AuthPlugin implements Interceptor {
     public Object intercept(Invocation invocation) throws Throwable {
         Object target = invocation.getTarget();
         //将boundSql里的sql，拼接权限语句
+        if (!Configuration.isInitSuccess()) {
+            return invocation.proceed();
+        }
         setAuthBoundSql(target);
         return invocation.proceed();
     }
@@ -45,7 +50,6 @@ public class AuthPlugin implements Interceptor {
     @Override
     public void setProperties(Properties properties) {
         try {
-            MyBatisAuthUtils.setDefaultProperties(properties);
             propertiesCheck(properties);
         } catch (AuthException e) {
             logger.error("权限插件异常：", e);
@@ -53,12 +57,12 @@ public class AuthPlugin implements Interceptor {
         }
     }
 
-    private void propertiesCheck(Properties properties) throws AuthException{
+    private void propertiesCheck(Properties properties) throws AuthException {
         String sqlType = properties.getProperty("sqlType");
-        if (SqlType.COMPLEX.toString().equalsIgnoreCase(sqlType)) {
-            Configuration.setSqlType(SqlType.COMPLEX);
-        } else if (SqlType.SIMPLE.toString().equalsIgnoreCase(sqlType)) {
-            Configuration.setSqlType(SqlType.SIMPLE);
+        if (AuthType.COMPLEX.toString().equalsIgnoreCase(sqlType)) {
+            Configuration.setAuthType(AuthType.COMPLEX);
+        } else if (AuthType.SIMPLE.toString().equalsIgnoreCase(sqlType)) {
+            Configuration.setAuthType(AuthType.SIMPLE);
         } else {
             throw new UnknownSqlTypeException("未知sqlType，仅支持 COMPLEX;SIMPLE");
         }
@@ -68,15 +72,17 @@ public class AuthPlugin implements Interceptor {
         MetaObject statementHandler = SystemMetaObject.forObject(handler);
         MetaObject boundSqlHandler;
         BoundSql boundSql;
+        MappedStatement mappedStatement;
+
         if (handler instanceof RoutingStatementHandler) {
             boundSql = (BoundSql) statementHandler.getValue("delegate.boundSql");
+            mappedStatement = (MappedStatement) statementHandler.getValue("delegate.mappedStatement");
         } else {
             boundSql = (BoundSql) statementHandler.getValue("boundSql");
+            mappedStatement = (MappedStatement) statementHandler.getValue("mappedStatement");
         }
         //判断是否select语句
-        //wdjtodo 判断方式待优化
-        String sql = boundSql.getSql();
-        if (sql.toLowerCase().indexOf("select") < 0) {
+        if (mappedStatement.getSqlCommandType() != SqlCommandType.SELECT) {
             return;
         }
         boundSqlHandler = SystemMetaObject.forObject(boundSql);
