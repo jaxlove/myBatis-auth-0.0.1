@@ -68,7 +68,7 @@ public class AuthPlugin implements Interceptor {
         }
     }
 
-    private void setAuthBoundSql(Object handler) {
+    private void setAuthBoundSql(Object handler) throws AuthException {
         MetaObject statementHandler = SystemMetaObject.forObject(handler);
         MetaObject boundSqlHandler;
         BoundSql boundSql;

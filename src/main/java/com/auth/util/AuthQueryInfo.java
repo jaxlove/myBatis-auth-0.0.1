@@ -1,6 +1,8 @@
 package com.auth.util;
 
 
+import com.auth.plugin.Configuration;
+
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -63,6 +65,15 @@ public class AuthQueryInfo {
 
     public void setAuthTableAlias(String authTableAlias) {
         this.authTableAlias = authTableAlias;
+    }
+
+    /**
+     * 获取当前查询需要的实际表别名
+     *
+     * @return
+     */
+    public String getCurTableAlias() {
+        return authTableAlias == null ? authTableAlias : Configuration.getAuthTableAlias();
     }
 
     public List<Properties> getAuthColumn() {

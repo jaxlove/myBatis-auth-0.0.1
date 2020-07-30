@@ -1,5 +1,6 @@
 package com.auth.util;
 
+import com.auth.exception.AuthException;
 import com.auth.plugin.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -16,7 +17,7 @@ public class MyBatisAuthUtils {
 
     private static final String EMPTY_SQL = Configuration.getEmptySql();
 
-    public static String getAuthSql(String sql) {
+    public static String getAuthSql(String sql) throws AuthException {
         //没有权限查询信息，权限查询为空或者为false,自动拼接权限sql为空或者false，返回原sql
         //curSearchInfo 新增同一线程可能需要使用多次（数据总数查询，列表查询），不可以将信息从curSearchInfo信息移除，移除信息放在DubboProviderAuthFilter中进行
         AuthQueryInfo curSearchInfo = AuthHelper.getCurSearchInfo();

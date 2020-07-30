@@ -63,6 +63,10 @@ public class Configuration {
 
     private static final String AUTH_TABLE_ALIAS = "AUTH_TABLE_ALIAS";
 
+    public static String getAuthTableAlias() {
+        return AUTH_TABLE_ALIAS;
+    }
+
     public static boolean isInitSuccess() {
         return initSuccess;
     }
