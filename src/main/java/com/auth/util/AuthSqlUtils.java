@@ -27,19 +27,19 @@ public class AuthSqlUtils {
             case SIMPLE:
                 if (selectSqlParser.hasColumn(authColumn)) {
                     //select ${AUTH_ALIAS}.* from ( sql ) ${AUTH_ALIAS} where authSql
-                    authSqlWhere = new SimpleAuthWhereHandler().getWhere(curSearchInfo.getCurTableAlias());
+                    authSqlWhere = new SimpleAbstractAuthWhereHandler().getWhere(curSearchInfo.getCurTableAlias());
                     appendOutSideAuth(sqlBuffer);
                     selectSqlParser = new SelectSqlParser(sqlBuffer.toString());
                     selectSqlParser.setWhere(authSqlWhere);
                 } else {
                     // select ${AUTH_ALIAS}.* from ( sql authSql )${AUTH_ALIAS}
-                    authSqlWhere = new SimpleAuthWhereHandler().getWhere(null);
+                    authSqlWhere = new SimpleAbstractAuthWhereHandler().getWhere(null);
                     selectSqlParser.setWhere(authSqlWhere);
                     appendOutSideAuth(sqlBuffer);
                 }
                 break;
             case COMPLEX:
-                authSqlWhere = new ComplexAuthWhereHandler().getWhere(Configuration.getAuthColumnTableAlias());
+                authSqlWhere = new ComplexAbstractAuthWhereHandler().getWhere(Configuration.getAuthColumnTableAlias());
                 appendOutSideAuth(sqlBuffer);
                 selectSqlParser = new SelectSqlParser(sqlBuffer.toString());
                 selectSqlParser.setWhere(authSqlWhere);

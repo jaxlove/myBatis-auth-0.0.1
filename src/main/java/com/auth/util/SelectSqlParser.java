@@ -353,6 +353,4 @@ public class SelectSqlParser {
             this.subSql = this.oldSql.substring(1, this.oldSql.length() - 1);
         }
     }
-
-
 }
