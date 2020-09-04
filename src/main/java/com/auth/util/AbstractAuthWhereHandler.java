@@ -1,10 +1,8 @@
 package com.auth.util;
 
 import com.auth.exception.AuthException;
+import com.auth.plugin.Configuration;
 import org.apache.commons.collections4.CollectionUtils;
-
-import java.util.List;
-import java.util.Properties;
 
 public abstract class AbstractAuthWhereHandler {
 
@@ -12,25 +10,22 @@ public abstract class AbstractAuthWhereHandler {
 
     protected boolean allDataSign = false;
 
-    /**
-     * 未处理标识
-     */
-    protected String UnHandled = "UnHandled";
-
     public String getWhere(String tableNameAlias) throws AuthException {
-        String preSet = authPreSet();
-        if (!UnHandled.equals(preSet)) {
-            return preSet;
+        Sign sign = authPreSet();
+        if (sign.equals(Sign.NONE)) {
+            return Configuration.getEmptySql();
+        } else if (sign.equals(Sign.ALL)) {
+            return null;
         }
         return doGetWhere(tableNameAlias);
     }
 
     abstract String doGetWhere(String tableNameAlias) throws AuthException;
 
-    protected String authPreSet() {
+    private Sign authPreSet() throws AuthException {
         //权限信息为空，权限查询为空或者false,返回null
         if (curSearchInfo == null || curSearchInfo.getAuthQuery() == null || !curSearchInfo.getAuthQuery()) {
-            return null;
+            return Sign.ALL;
         }
         allDataSign = curSearchInfo.isAllDataSign();
         //超管，设置为全部数据权限
@@ -39,14 +34,13 @@ public abstract class AbstractAuthWhereHandler {
         }
         //无数据权限，返回空
         if (!allDataSign && CollectionUtils.isEmpty(curSearchInfo.getDataScope())) {
-            return "(0 = 1)";
+            return Sign.NONE;
         }
-        //权限字段
-        List<Properties> authColumnNames = curSearchInfo.getAuthColumn();
-        if (CollectionUtils.isEmpty(authColumnNames)) {
-            return null;
-        }
-        return UnHandled;
+        return Sign.AUTH;
+    }
+
+    enum Sign {
+        AUTH, UN_HANDLED, ALL, NONE
     }
 
 }

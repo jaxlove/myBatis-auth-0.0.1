@@ -2,6 +2,7 @@ package com.auth.util;
 
 import com.auth.exception.AuthException;
 import com.auth.exception.UnSurpportJdbcType;
+import com.auth.plugin.Configuration;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.type.TypeAliasRegistry;
@@ -27,11 +28,11 @@ public class SimpleAbstractAuthWhereHandler extends AbstractAuthWhereHandler {
         tableNameAlias = StringUtils.isBlank(tableNameAlias) ? curSearchInfo.getAuthTableAlias() : tableNameAlias;
         //获取所有的权限的条件
         List<String> authAuthList = new ArrayList<>();
-        List<Properties> authColumnNames = curSearchInfo.getAuthColumn();
-        for (Properties authColumn : authColumnNames) {
+        List<Properties> authColumns = curSearchInfo.getAuthColumn();
+        for (Properties authColumn : authColumns) {
             String singleColumnAuth = null;
             if (allDataSign) {
-                Boolean authColumnCheck = Boolean.getBoolean(authColumn.getProperty("authColumnCheck"));
+                Boolean authColumnCheck = Configuration.getAuthColumnCheck();
                 if (authColumnCheck != null && authColumnCheck) {
                     singleColumnAuth = " nvl(" + getAliasAndColumnName(tableNameAlias, authColumn) + ",-999999) = nvl(" + getAliasAndColumnName(tableNameAlias, authColumn) + ",-999999)";
                 }

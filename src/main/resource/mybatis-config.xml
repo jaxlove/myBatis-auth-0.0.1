@@ -5,7 +5,7 @@
 <configuration>
     <settings>
         <setting name="cacheEnabled" value="true"/>
-<!--        自动转驼峰-->
+        <!--        自动转驼峰-->
         <setting name="mapUnderscoreToCamelCase" value="true"/>
         <setting name="logImpl" value="STDOUT_LOGGING"/>
         <setting name="jdbcTypeForNull" value="NULL"/>
@@ -27,6 +27,11 @@
         </plugin>
         <!--权限插件-->
         <plugin interceptor="com.auth.plugin.AuthPlugin">
+            <property name="dialect" value="oracle"/>
+            <property name="sqlType" value="SIMPLE"/>
+            <property name="authColumnCheck" value="true"/>
+            <property name="authColumn" value="CITY_ID##VARCHAR@@ACCOUNT_ID##INT"/>
+            <property name="relationTypeEnum" value="AND"/>
         </plugin>
     </plugins>
 

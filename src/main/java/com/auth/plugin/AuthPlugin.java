@@ -1,8 +1,12 @@
 package com.auth.plugin;
 
 import com.auth.exception.AuthException;
+import com.auth.exception.UnKownDialect;
 import com.auth.exception.UnknownSqlTypeException;
 import com.auth.util.MyBatisAuthUtils;
+import com.auth.util.RelationTypeEnum;
+import com.auth.util.pagehelper.DialectUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.executor.statement.RoutingStatementHandler;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
@@ -15,6 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -30,10 +36,10 @@ public class AuthPlugin implements Interceptor {
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         Object target = invocation.getTarget();
-        //将boundSql里的sql，拼接权限语句
         if (!Configuration.isInitSuccess()) {
             return invocation.proceed();
         }
+        //将boundSql里的sql，拼接权限语句
         setAuthBoundSql(target);
         return invocation.proceed();
     }
@@ -58,6 +64,10 @@ public class AuthPlugin implements Interceptor {
     }
 
     private void propertiesCheck(Properties properties) throws AuthException {
+        String dialect = properties.getProperty("dialect");
+        if (StringUtils.isNotBlank(dialect) && !DialectUtil.kownDialect(dialect)) {
+            throw new UnKownDialect("未知dialect：" + dialect);
+        }
         String sqlType = properties.getProperty("sqlType");
         if (AuthType.COMPLEX.toString().equalsIgnoreCase(sqlType)) {
             Configuration.setAuthType(AuthType.COMPLEX);
@@ -65,6 +75,30 @@ public class AuthPlugin implements Interceptor {
             Configuration.setAuthType(AuthType.SIMPLE);
         } else {
             throw new UnknownSqlTypeException("未知sqlType，仅支持 COMPLEX;SIMPLE");
+        }
+
+        String authColumnCheck = properties.getProperty("authColumnCheck");
+        if (StringUtils.isNotBlank(authColumnCheck)) {
+            Boolean aBoolean = Boolean.valueOf(authColumnCheck);
+            Configuration.setAuthColumnCheck(aBoolean);
+        }
+
+        String relationTypeEnum = properties.getProperty("relationTypeEnum");
+        if (StringUtils.isNotBlank(relationTypeEnum)) {
+            Configuration.setRelationTypeEnum(RelationTypeEnum.valueOf(relationTypeEnum.toUpperCase()));
+        }
+
+        String authColumn = properties.getProperty("authColumn");
+        if (StringUtils.isNotBlank(authColumn)) {
+            String[] authColumns = authColumn.split("@@");
+            List<Properties> authColumList = new ArrayList<>();
+            for (String column : authColumns) {
+                Properties columnProperties = new Properties();
+                columnProperties.put("column", column.split("##")[0]);
+                columnProperties.put("jdbcType", column.split("##")[1]);
+                authColumList.add(columnProperties);
+            }
+            Configuration.setAuthColumn(authColumList);
         }
     }
 
@@ -86,7 +120,7 @@ public class AuthPlugin implements Interceptor {
             return;
         }
         boundSqlHandler = SystemMetaObject.forObject(boundSql);
-        boundSqlHandler.setValue("sql", MyBatisAuthUtils.getAuthSql(boundSqlHandler.getValue("sql").toString()));
+        boundSqlHandler.setValue("sql", MyBatisAuthUtils.getAuthSql(boundSqlHandler.getValue("sql").toString(),mappedStatement));
     }
 
 }
