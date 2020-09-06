@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 /**
  * @author wangdejun
- * @description: TODO description
+ * @description: oracle pagehelper处理类
  * @date 2020/9/4 11:12
  */
 public class OracleDialect implements DialectHandler {
@@ -17,7 +17,7 @@ public class OracleDialect implements DialectHandler {
     private static ThreadLocal<String> pageHelperSufSqlThread = ThreadLocal.withInitial(() -> "");
 
     @Override
-    public void getNativeSql(StringBuilder sql) {
+    public void getNativeSelectSql(StringBuilder sql) {
         Pattern pattern = Pattern.compile("\\)(\\s){0,}tmp_page(.*)", Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(sql);
         String originSql = null;
@@ -33,6 +33,11 @@ public class OracleDialect implements DialectHandler {
             originSql.substring(originSql.indexOf("(") + 1);
         }
         pageHelperPreSqlThread.set(pageHelperPreSql);
+    }
+
+    @Override
+    public void getNativeCountSql(StringBuilder sql) {
+
     }
 
     @Override

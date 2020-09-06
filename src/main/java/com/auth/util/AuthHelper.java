@@ -11,6 +11,11 @@ public class AuthHelper {
 
     private static final ThreadLocal<AuthQueryInfo> LOCAL_CUR_AUTHINFO = new InheritableThreadLocal<>();
 
+    /**
+     * todo
+     * 需要自行set，否则权限sql不会生效
+     * @param authQueryInfo
+     */
     public static void setCurSearch(AuthQueryInfo authQueryInfo) {
         LOCAL_CUR_AUTHINFO.set(authQueryInfo);
     }

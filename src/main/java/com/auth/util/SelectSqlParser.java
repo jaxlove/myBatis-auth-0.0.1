@@ -20,8 +20,6 @@ import java.util.stream.Collectors;
  */
 public class SelectSqlParser {
 
-    private static final String BLANK = " ";
-
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
@@ -42,7 +40,7 @@ public class SelectSqlParser {
     /**
      * #sub_sql# 倆遍要加空格，否则可能出现 select * from() => select * from#sub_sql#，导致后面无法解析
      */
-    private static final String SUB_SQL = BLANK + "#sub_sql#" + BLANK;
+    private static final String SUB_SQL = Contant.BLANK + "#sub_sql#" + Contant.BLANK;
 
     /**
      * 原始Sql语句
@@ -50,9 +48,10 @@ public class SelectSqlParser {
     protected String originalSql;
 
     /**
-     * 用于解析的sql
+     * 去除子查询的简单sql
+     * eg: select * from #sub_sql# where x.y=1
      */
-    protected String parsingSql;
+    protected String simpleSql;
 
     /**
      * Sql语句片段
@@ -68,9 +67,9 @@ public class SelectSqlParser {
         //注意sql中，可能包含着myBatis中的各种表达式，不可以转为大写/小写
         this.originalSql = sql;
         //去除多余空格
-        parsingSql = sql.trim().replaceAll("\\s+", BLANK) + BLANK + END_SIGNAL;
+        simpleSql = sql.trim().replaceAll("\\s+", Contant.BLANK) + Contant.BLANK + END_SIGNAL;
         //去除带有括号的子查询
-        this.parsingSql = replaceSubSql(parsingSql);
+        setSimpleSql();
         initializeSegments();
         splitSql2Segment();
     }
@@ -79,7 +78,7 @@ public class SelectSqlParser {
      * 初始化segments
      */
     private void initializeSegments() {
-        String[] split = this.parsingSql.split("([sS][eE][lL][eE][cC][tT])");
+        String[] split = this.simpleSql.split("([sS][eE][lL][eE][cC][tT])");
         this.preSelectSql = split[0];
         // ? 正则 代表非贪心模式，按最短匹配
         segments.add(new SqlSegment("(select )(.+?)( from )", "[,]"));
@@ -89,36 +88,44 @@ public class SelectSqlParser {
         segments.add(new SqlSegment("( order by )(.+?)( " + END_SIGNAL + ")", "[,]"));
     }
 
+    public String getSimpleSql() {
+        return simpleSql;
+    }
+
     /**
      * 将parsingSql劈分成一个个片段
      */
     private void splitSql2Segment() {
         for (SqlSegment sqlSegment : segments) {
-            sqlSegment.parse(parsingSql);
+            sqlSegment.parse(simpleSql);
         }
     }
 
-    private String replaceSubSql(String sql) {
+    /**
+     * 将所有子查询，用 SUB_SQL 代替，只解析简单的查询sql
+     *
+     * @return
+     */
+    public void setSimpleSql() {
         int start = 0;
         int startFlag = 0;
         int endFlag = 0;
-        for (int i = 0; i < sql.length(); i++) {
-            if (sql.charAt(i) == '(') {
+        for (int i = 0; i < simpleSql.length(); i++) {
+            if (simpleSql.charAt(i) == '(') {
                 startFlag++;
                 if (startFlag == endFlag + 1) {
                     start = i;
                 }
-            } else if (sql.charAt(i) == ')') {
+            } else if (simpleSql.charAt(i) == ')') {
                 endFlag++;
                 if (endFlag == startFlag) {
-                    String subSql = sql.substring(start, i + 1);
+                    String subSql = simpleSql.substring(start, i + 1);
                     subSqlList.add(new SubSql(subSql));
-                    sql = sql.substring(0, start) + SUB_SQL + sql.substring(i + 1);
-                    sql = replaceSubSql(sql);
+                    simpleSql = simpleSql.substring(0, start) + SUB_SQL + simpleSql.substring(i + 1);
+                    setSimpleSql();
                 }
             }
         }
-        return sql;
     }
 
     private String fullSubSql(String sql) {

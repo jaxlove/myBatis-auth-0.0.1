@@ -30,7 +30,9 @@ package com.auth.util.pagehelper;
  * @author liuzh
  */
 public interface DialectHandler {
-    void getNativeSql(StringBuilder sql);
+    void getNativeSelectSql(StringBuilder sql);
+
+    void getNativeCountSql(StringBuilder sql);
 
     void sufHandler(StringBuilder sql);
 

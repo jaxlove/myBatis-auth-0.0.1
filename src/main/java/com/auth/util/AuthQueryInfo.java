@@ -27,12 +27,12 @@ public class AuthQueryInfo {
     /**
      * 是否自动拼接权限sql
      */
-    private Boolean autoAppendAuth;
+    private Boolean autoAppendAuth = true;
 
     /**
      * 是否为权限查询
      */
-    private Boolean authQuery;
+    private Boolean authQuery = true;
 
     /**
      * 权限查询数据库字段，可以为多个
@@ -73,7 +73,7 @@ public class AuthQueryInfo {
      * @return
      */
     public String getCurTableAlias() {
-        return authTableAlias == null ? authTableAlias : Configuration.getAuthTableAlias();
+        return authTableAlias;
     }
 
     public List<Properties> getAuthColumn() {

@@ -1,8 +1,10 @@
 package com.auth.util.pagehelper;
 
 import com.auth.plugin.Configuration;
+import com.auth.util.SelectSqlParser;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -18,13 +20,13 @@ public class PageHelperUtil {
 
     private static void init() {
         String dialect = Configuration.getDialect();
-        if (!StringUtils.isNotBlank(dialect)) {
+        if (StringUtils.isNotBlank(dialect)) {
             dialectHandler = DialectUtil.getDialect(dialect);
         }
     }
 
 
-    public static void sufHandler(StringBuilder sql) {
+    public static void sufHandler(StringBuilder sql, String mappedStatementId, Object parameterObject) {
         if (!inited.getAndSet(true)) {
             init();
         }
@@ -37,11 +39,14 @@ public class PageHelperUtil {
      * @param sql
      * @return
      */
-    public static void setNativeSql(StringBuilder sql) {
+    public static void setNativeSql(StringBuilder sql, String mappedStatementId, Object parameterObject) {
         if (!inited.getAndSet(true)) {
             init();
         }
-        dialectHandler.getNativeSql(sql);
+        if (isPageSelect(parameterObject)) {
+            dialectHandler.getNativeSelectSql(sql);
+        }
+
     }
 
 
@@ -60,8 +65,31 @@ public class PageHelperUtil {
      *
      * @return
      */
-    public static boolean isPageSelect() {
+    private static boolean isPageSelect(Object parameterObject) {
+        if (parameterObject.getClass().isAssignableFrom(Map.class) &&
+                (((Map) parameterObject).containsKey("First__PageHelper") || ((Map) parameterObject).containsKey("Second__PageHelper"))) {
+            return true;
+        }
         return false;
+    }
+
+    private static boolean isPageCount(StringBuilder sql) {
+        SelectSqlParser selectSqlParser = new SelectSqlParser(sql.toString());
+        String simpleSql = selectSqlParser.getSimpleSql();
+        // select count(0) from #sub_sql# tmp_cout
+        if (simpleSql.matches("select(\\s+)count\\((.+)\\)t(\\s+)fromt(\\s+)#sub_sql#t(\\s+)tmp_count")) {
+            return true;
+        }
+        return false;
+    }
+
+    private static Class getClass(String className) {
+        try {
+            Class<?> class_ = Class.forName("className");
+            return class_;
+        } catch (ClassNotFoundException e) {
+            return null;
+        }
     }
 
 }

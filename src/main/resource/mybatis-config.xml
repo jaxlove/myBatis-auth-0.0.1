@@ -30,7 +30,7 @@
             <property name="dialect" value="oracle"/>
             <property name="sqlType" value="SIMPLE"/>
             <property name="authColumnCheck" value="true"/>
-            <property name="authColumn" value="CITY_ID##VARCHAR@@ACCOUNT_ID##INT"/>
+            <property name="authColumn" value="CITY_ID##Number"/>
             <property name="relationTypeEnum" value="AND"/>
         </plugin>
     </plugins>

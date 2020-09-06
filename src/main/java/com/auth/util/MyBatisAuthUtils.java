@@ -3,7 +3,6 @@ package com.auth.util;
 import com.auth.exception.AuthException;
 import com.auth.plugin.Configuration;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.mapping.MappedStatement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,9 +17,9 @@ public class MyBatisAuthUtils {
 
     private static final String EMPTY_SQL = Configuration.getEmptySql();
 
-    public static String getAuthSql(String sql, MappedStatement mappedStatement) throws AuthException {
+    public static String getAuthSql(String sql, String mappedStatementId, Object parameterObject) throws AuthException {
         //没有权限查询信息，权限查询为空或者为false,自动拼接权限sql为空或者false，返回原sql
-        //curSearchInfo 新增同一线程可能需要使用多次（数据总数查询，列表查询），不可以将信息从curSearchInfo信息移除，移除信息放在DubboProviderAuthFilter中进行
+        //curSearchInfo 新增同一线程可能需要使用多次（数据总数查询，列表查询），不可以将信息从curSearchInfo信息移除，移除操作需要自己实现
         AuthQueryInfo curSearchInfo = AuthHelper.getCurSearchInfo();
         if (curSearchInfo == null
                 || curSearchInfo.getAuthQuery() == null || !curSearchInfo.getAuthQuery()
@@ -28,7 +27,7 @@ public class MyBatisAuthUtils {
             return sql;
         }
         //sql为空，或者已经包含 ${AUTH_ALIAS}，返回原sql
-        if (StringUtils.isBlank(sql) || sql.contains(Configuration.getAuthColumnTableAlias())) {
+        if (StringUtils.isBlank(sql) || sql.contains(Configuration.getAuthTableAlias())) {
             return sql;
         }
         //全部数据权限
@@ -39,7 +38,7 @@ public class MyBatisAuthUtils {
         if (curSearchInfo.getDataScope() == null || curSearchInfo.getDataScope().isEmpty()) {
             return EMPTY_SQL;
         }
-        return AuthSqlUtils.getAuthSql(sql);
+        return AuthSqlUtils.getAuthSql(sql, mappedStatementId, parameterObject);
     }
 
     /**

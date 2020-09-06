@@ -15,10 +15,10 @@ import java.util.Properties;
  */
 public class AuthSqlUtils {
 
-    public static String getAuthSql(String sql) throws AuthException {
+    public static String getAuthSql(String sql, String mappedStatementId, Object parameterObject) throws AuthException {
         AuthQueryInfo curSearchInfo = AuthHelper.getCurSearchInfo();
-        StringBuilder sqlBuffer = new StringBuilder(sql);
-        PageHelperUtil.setNativeSql(sqlBuffer);
+        StringBuilder sqlBuilder = new StringBuilder(sql);
+        PageHelperUtil.setNativeSql(sqlBuilder, mappedStatementId, parameterObject);
         SelectSqlParser selectSqlParser = new SelectSqlParser(sql);
         //获取权限where条件
         String authSqlWhere;
@@ -29,6 +29,7 @@ public class AuthSqlUtils {
                 if (authColumns == null || authColumns.isEmpty()) {
                     if (authColumns == null || authColumns.isEmpty()) {
                         authColumns = Configuration.getAuthColumn();
+                        curSearchInfo.setAuthColumn(authColumns);
                     }
                     if (authColumns == null || authColumns.isEmpty()) {
                         throw new AuthException("未获取到权限列信息");
@@ -37,27 +38,30 @@ public class AuthSqlUtils {
                 if (selectSqlParser.hasColumn(authColumns)) {
                     //select ${AUTH_ALIAS}.* from ( sql ) ${AUTH_ALIAS} where authSql
                     authSqlWhere = new SimpleAbstractAuthWhereHandler().getWhere(curSearchInfo.getCurTableAlias());
-                    appendOutSideAuth(sqlBuffer);
-                    selectSqlParser = new SelectSqlParser(sqlBuffer.toString());
+                    appendOutSideAuth(sqlBuilder);
+                    selectSqlParser = new SelectSqlParser(sqlBuilder.toString());
                     selectSqlParser.setWhere(authSqlWhere);
+                    sqlBuilder = new StringBuilder(selectSqlParser.getParsedSql());
                 } else {
                     // select ${AUTH_ALIAS}.* from ( sql authSql )${AUTH_ALIAS}
                     authSqlWhere = new SimpleAbstractAuthWhereHandler().getWhere(curSearchInfo.getCurTableAlias());
                     selectSqlParser.setWhere(authSqlWhere);
-                    appendOutSideAuth(sqlBuffer);
+                    sqlBuilder = new StringBuilder(selectSqlParser.getParsedSql());
+                    appendOutSideAuth(sqlBuilder);
                 }
                 break;
             case COMPLEX:
                 authSqlWhere = new ComplexAbstractAuthWhereHandler().getWhere(Configuration.getAuthColumnTableAlias());
-                appendOutSideAuth(sqlBuffer);
-                selectSqlParser = new SelectSqlParser(sqlBuffer.toString());
+                appendOutSideAuth(sqlBuilder);
+                selectSqlParser = new SelectSqlParser(sqlBuilder.toString());
                 selectSqlParser.setWhere(authSqlWhere);
+                sqlBuilder = new StringBuilder(selectSqlParser.getParsedSql());
                 break;
             default:
                 throw new UnknownAuthTypeException("未知权限查询类型");
         }
-        PageHelperUtil.sufHandler(sqlBuffer);
-        return sqlBuffer.toString();
+        PageHelperUtil.sufHandler(sqlBuilder, mappedStatementId, parameterObject);
+        return sqlBuilder.toString();
     }
 
     /**

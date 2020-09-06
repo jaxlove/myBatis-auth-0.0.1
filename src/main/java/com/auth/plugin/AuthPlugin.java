@@ -7,7 +7,6 @@ import com.auth.util.MyBatisAuthUtils;
 import com.auth.util.RelationTypeEnum;
 import com.auth.util.pagehelper.DialectUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.executor.statement.RoutingStatementHandler;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -18,6 +17,7 @@ import org.apache.ibatis.reflection.SystemMetaObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,9 +65,10 @@ public class AuthPlugin implements Interceptor {
 
     private void propertiesCheck(Properties properties) throws AuthException {
         String dialect = properties.getProperty("dialect");
-        if (StringUtils.isNotBlank(dialect) && !DialectUtil.kownDialect(dialect)) {
+        if (StringUtils.isNotBlank(dialect) && !DialectUtil.knownDialect(dialect)) {
             throw new UnKownDialect("未知dialect：" + dialect);
         }
+        Configuration.setDialect(dialect);
         String sqlType = properties.getProperty("sqlType");
         if (AuthType.COMPLEX.toString().equalsIgnoreCase(sqlType)) {
             Configuration.setAuthType(AuthType.COMPLEX);
@@ -95,7 +96,7 @@ public class AuthPlugin implements Interceptor {
             for (String column : authColumns) {
                 Properties columnProperties = new Properties();
                 columnProperties.put("column", column.split("##")[0]);
-                columnProperties.put("jdbcType", column.split("##")[1]);
+                columnProperties.put("type", column.split("##")[1]);
                 authColumList.add(columnProperties);
             }
             Configuration.setAuthColumn(authColumList);
@@ -103,24 +104,32 @@ public class AuthPlugin implements Interceptor {
     }
 
     private void setAuthBoundSql(Object handler) throws AuthException {
-        MetaObject statementHandler = SystemMetaObject.forObject(handler);
-        MetaObject boundSqlHandler;
-        BoundSql boundSql;
-        MappedStatement mappedStatement;
-
-        if (handler instanceof RoutingStatementHandler) {
-            boundSql = (BoundSql) statementHandler.getValue("delegate.boundSql");
-            mappedStatement = (MappedStatement) statementHandler.getValue("delegate.mappedStatement");
-        } else {
-            boundSql = (BoundSql) statementHandler.getValue("boundSql");
-            mappedStatement = (MappedStatement) statementHandler.getValue("mappedStatement");
-        }
+        //代理类处理
+        StatementHandler nativeHandler = getNativeHandler((StatementHandler) handler);
+        MetaObject statementHandlerMetaObject = SystemMetaObject.forObject(nativeHandler);
+        BoundSql boundSql = (BoundSql) statementHandlerMetaObject.getValue("boundSql");
+        MappedStatement mappedStatement = (MappedStatement) statementHandlerMetaObject.getValue("mappedStatement");
         //判断是否select语句
         if (mappedStatement.getSqlCommandType() != SqlCommandType.SELECT) {
             return;
         }
-        boundSqlHandler = SystemMetaObject.forObject(boundSql);
-        boundSqlHandler.setValue("sql", MyBatisAuthUtils.getAuthSql(boundSqlHandler.getValue("sql").toString(),mappedStatement));
+        MetaObject metaObject = SystemMetaObject.forObject(boundSql);
+        String mappedStatementId = mappedStatement.getId();
+        Object parameterObject = boundSql.getParameterObject();
+        metaObject.setValue("sql", MyBatisAuthUtils.getAuthSql(metaObject.getValue("sql").toString(), mappedStatementId, parameterObject));
+    }
+
+    //代理类处理
+    private StatementHandler getNativeHandler(StatementHandler statementHandler) {
+        Field[] declaredFields = statementHandler.getClass().getDeclaredFields();
+        //代理类处理
+        for (Field declaredField : declaredFields) {
+            if (declaredField.getType().isAssignableFrom(StatementHandler.class)) {
+                MetaObject metaObject = SystemMetaObject.forObject(statementHandler);
+                return getNativeHandler((StatementHandler) metaObject.getValue(declaredField.getName()));
+            }
+        }
+        return statementHandler;
     }
 
 }

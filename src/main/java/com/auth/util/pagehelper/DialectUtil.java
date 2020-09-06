@@ -73,7 +73,7 @@ public class DialectUtil {
         return dialectInstanceCache.get(alias);
     }
 
-    public static boolean kownDialect(String alias) {
+    public static boolean knownDialect(String alias) {
         return dialectAliasMap.containsKey(alias);
     }
 }

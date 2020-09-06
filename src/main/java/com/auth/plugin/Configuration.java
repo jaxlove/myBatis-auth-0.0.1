@@ -25,7 +25,7 @@ public class Configuration {
     /**
      * 空sql
      */
-    private static String EMPTY_SQL = null;
+    private static String EMPTY_SQL = "select 0 from dual where 0=1";
 
     /**
      * 是否自动拼接权限sql

@@ -9,7 +9,7 @@ spring:
     active: dev
   datasource:
     driver-class-name: oracle.jdbc.OracleDriver
-    url: ENC(wCjUiZoVZjXI5AfkrYItRrAZcrdI6+HkwqXl21aSkf94Wucj1+AkNkRQ3ZbrXyhCPJn8QhxY69k=)
+    url: jdbc:oracle:thin:@192.168.104.26:1521:ORCL
     filters: stat
     initialSize: 20
     username: ENC(gm0TS4zPG/mBLOHR+z7hgQ==)
