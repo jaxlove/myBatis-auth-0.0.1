@@ -17,7 +17,7 @@ public class OracleDialect implements DialectHandler {
     private static ThreadLocal<String> pageHelperSufSqlThread = ThreadLocal.withInitial(() -> "");
 
     @Override
-    public void getNativeSelectSql(StringBuilder sql) {
+    public String getNativeSelectSql(String sql) {
         Pattern pattern = Pattern.compile("\\)(\\s){0,}tmp_page(.*)", Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(sql);
         String originSql = null;
@@ -33,17 +33,19 @@ public class OracleDialect implements DialectHandler {
             originSql.substring(originSql.indexOf("(") + 1);
         }
         pageHelperPreSqlThread.set(pageHelperPreSql);
+        return originSql;
     }
 
     @Override
-    public void getNativeCountSql(StringBuilder sql) {
-
+    public String getNativeCountSql(String sql) {
+        return null;
     }
 
     @Override
-    public void sufHandler(StringBuilder sql) {
-        sql.insert(0, pageHelperPreSqlThread.get()).append(pageHelperSufSqlThread.get());
+    public String sufHandler(String sql) {
+        sql = pageHelperPreSqlThread.get() + sql + pageHelperSufSqlThread.get();
         pageHelperPreSqlThread.remove();
         pageHelperSufSqlThread.remove();
+        return sql;
     }
 }

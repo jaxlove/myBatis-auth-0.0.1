@@ -26,11 +26,11 @@ public class PageHelperUtil {
     }
 
 
-    public static void sufHandler(StringBuilder sql, String mappedStatementId, Object parameterObject) {
+    public static String sufHandler(String sql, String mappedStatementId, Object parameterObject) {
         if (!inited.getAndSet(true)) {
             init();
         }
-        dialectHandler.sufHandler(sql);
+        return dialectHandler.sufHandler(sql);
     }
 
     /**
@@ -39,13 +39,14 @@ public class PageHelperUtil {
      * @param sql
      * @return
      */
-    public static void setNativeSql(StringBuilder sql, String mappedStatementId, Object parameterObject) {
+    public static String setNativeSql(String sql, String mappedStatementId, Object parameterObject) {
         if (!inited.getAndSet(true)) {
             init();
         }
         if (isPageSelect(parameterObject)) {
-            dialectHandler.getNativeSelectSql(sql);
+            return dialectHandler.getNativeSelectSql(sql);
         }
+        return sql;
 
     }
 

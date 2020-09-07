@@ -1,46 +1,54 @@
 package com.auth.util;
 
+import com.auth.authSql.WhereScope;
+import com.auth.authSql.WhereSql;
+import com.auth.entity.BaseAuthInfo;
+import com.auth.entity.SimpleAuthInfo;
 import com.auth.exception.AuthException;
+import com.auth.plugin.AuthType;
 import com.auth.plugin.Configuration;
 import org.apache.commons.collections4.CollectionUtils;
 
 public abstract class AbstractAuthWhereHandler {
 
-    protected AuthQueryInfo curSearchInfo = AuthHelper.getCurSearchInfo();
+    protected BaseAuthInfo authInfo = AuthHelper.getCurSearchInfo();
 
-    protected boolean allDataSign = false;
-
-    public String getWhere(String tableNameAlias) throws AuthException {
-        Sign sign = authPreSet();
-        if (sign.equals(Sign.NONE)) {
-            return Configuration.getEmptySql();
-        } else if (sign.equals(Sign.ALL)) {
-            return null;
+    public WhereSql getWhere(String tableNameAlias) throws AuthException {
+        WhereScope whereScope = getWhereScope();
+        if (whereScope.equals(WhereScope.NONE)) {
+            return new WhereSql(WhereScope.NONE, "(0=1)");
+        } else if (whereScope.equals(WhereScope.ALL)) {
+            new WhereSql(WhereScope.ALL);
         }
-        return doGetWhere(tableNameAlias);
+        return new WhereSql(WhereScope.AUTH, getAuthWhere(tableNameAlias));
     }
 
-    abstract String doGetWhere(String tableNameAlias) throws AuthException;
+    abstract String getAuthWhere(String tableNameAlias) throws AuthException;
 
-    private Sign authPreSet() throws AuthException {
+    /**
+     * 查询类型
+     *
+     * @return
+     * @throws AuthException
+     */
+    private WhereScope getWhereScope() throws AuthException {
         //权限信息为空，权限查询为空或者false,返回null
-        if (curSearchInfo == null || curSearchInfo.getAuthQuery() == null || !curSearchInfo.getAuthQuery()) {
-            return Sign.ALL;
+        if (authInfo == null || authInfo.getAuthQuery() == null || !authInfo.getAuthQuery()) {
+            return WhereScope.ALL;
         }
-        allDataSign = curSearchInfo.isAllDataSign();
+        Boolean allDataSign = authInfo.isAllDataSign();
         //超管，设置为全部数据权限
-        if (allDataSign) {
+        if (allDataSign != null && allDataSign) {
             return null;
         }
-        //无数据权限，返回空
-        if (!allDataSign && CollectionUtils.isEmpty(curSearchInfo.getDataScope())) {
-            return Sign.NONE;
+        if (Configuration.getAuthType().equals(AuthType.SIMPLE)) {
+            //无数据权限，返回空
+            if (!allDataSign && CollectionUtils.isEmpty(((SimpleAuthInfo) authInfo).getDataScope())) {
+                return WhereScope.NONE;
+            }
         }
-        return Sign.AUTH;
+        return WhereScope.AUTH;
     }
 
-    enum Sign {
-        AUTH, UN_HANDLED, ALL, NONE
-    }
 
 }

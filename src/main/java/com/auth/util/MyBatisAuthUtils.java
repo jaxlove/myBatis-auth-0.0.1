@@ -1,5 +1,6 @@
 package com.auth.util;
 
+import com.auth.entity.BaseAuthInfo;
 import com.auth.exception.AuthException;
 import com.auth.plugin.Configuration;
 import org.apache.commons.lang3.StringUtils;
@@ -19,41 +20,18 @@ public class MyBatisAuthUtils {
 
     public static String getAuthSql(String sql, String mappedStatementId, Object parameterObject) throws AuthException {
         //没有权限查询信息，权限查询为空或者为false,自动拼接权限sql为空或者false，返回原sql
-        //curSearchInfo 新增同一线程可能需要使用多次（数据总数查询，列表查询），不可以将信息从curSearchInfo信息移除，移除操作需要自己实现
-        AuthQueryInfo curSearchInfo = AuthHelper.getCurSearchInfo();
-        if (curSearchInfo == null
-                || curSearchInfo.getAuthQuery() == null || !curSearchInfo.getAuthQuery()
-                || curSearchInfo.getAutoAppendAuth() == null || !curSearchInfo.getAutoAppendAuth()) {
+        //authInfo 新增同一线程可能需要使用多次（数据总数查询，列表查询），不可以将信息从curSearchInfo信息移除，移除操作需要自己实现
+        BaseAuthInfo authInfo = AuthHelper.getCurSearchInfo();
+        if (authInfo == null
+                || authInfo.getAuthQuery() == null || !authInfo.getAuthQuery()
+                || authInfo.getAutoAppendAuth() == null || !authInfo.getAutoAppendAuth()) {
             return sql;
         }
         //sql为空，或者已经包含 ${AUTH_ALIAS}，返回原sql
-        if (StringUtils.isBlank(sql) || sql.contains(Configuration.getAuthTableAlias())) {
+        if (StringUtils.isBlank(sql) || sql.contains(Configuration.getAuthTableSign())) {
             return sql;
-        }
-        //全部数据权限
-        if (curSearchInfo.isAllDataSign()) {
-            return sql;
-        }
-        //无数据权限，返回空
-        if (curSearchInfo.getDataScope() == null || curSearchInfo.getDataScope().isEmpty()) {
-            return EMPTY_SQL;
         }
         return AuthSqlUtils.getAuthSql(sql, mappedStatementId, parameterObject);
-    }
-
-    /**
-     * 向plainSelect中设置权限信息
-     *
-     * @param selectSqlParser
-     * @param authSql
-     */
-    private static String setAuthWhere(SelectSqlParser selectSqlParser, String authSql) {
-        //拼接where条件
-        if (StringUtils.isBlank(authSql)) {
-            return selectSqlParser.getParsedSql();
-        }
-        selectSqlParser.setWhere(authSql);
-        return selectSqlParser.getParsedSql();
     }
 
 }

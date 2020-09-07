@@ -1,7 +1,7 @@
-package com.auth.util;
+package com.auth.entity;
 
 
-import com.auth.plugin.Configuration;
+import com.auth.util.RelationTypeEnum;
 
 import java.util.List;
 import java.util.Properties;

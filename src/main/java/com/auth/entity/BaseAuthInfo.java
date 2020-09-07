@@ -25,6 +25,19 @@ public class BaseAuthInfo {
      */
     private String authSql;
 
+    /**
+     * 是否查询全部数据
+     */
+    private Boolean allDataSign = false;
+
+    public Boolean isAllDataSign() {
+        return allDataSign;
+    }
+
+    public void setAllDataSign(Boolean allDataSign) {
+        this.allDataSign = allDataSign;
+    }
+
     public Boolean getAutoAppendAuth() {
         return autoAppendAuth;
     }

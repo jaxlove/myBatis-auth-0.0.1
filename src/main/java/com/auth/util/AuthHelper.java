@@ -1,6 +1,10 @@
 package com.auth.util;
 
+import com.auth.authSql.WhereSql;
+import com.auth.entity.AuthQueryInfo;
+import com.auth.entity.BaseAuthInfo;
 import com.auth.entity.SimpleAuthInfo;
+import com.auth.exception.AuthException;
 
 /**
  * @author wangdejun
@@ -9,15 +13,21 @@ import com.auth.entity.SimpleAuthInfo;
  */
 public class AuthHelper {
 
-    private static final ThreadLocal<AuthQueryInfo> LOCAL_CUR_AUTHINFO = new InheritableThreadLocal<>();
+    private static final ThreadLocal<BaseAuthInfo> LOCAL_CUR_AUTHINFO = new InheritableThreadLocal<>();
 
     /**
      * todo
      * 需要自行set，否则权限sql不会生效
-     * @param authQueryInfo
+     *
+     * @param authInfo
      */
-    public static void setCurSearch(AuthQueryInfo authQueryInfo) {
-        LOCAL_CUR_AUTHINFO.set(authQueryInfo);
+    public static void setCurSearch(BaseAuthInfo authInfo) throws AuthException {
+        LOCAL_CUR_AUTHINFO.set(authInfo);
+        //设置权限sql where条件
+        if (authInfo.getAuthQuery() != null && authInfo.getAuthQuery()) {
+            WhereSql whereSql = AuthSqlUtils.getAuthWhere();
+            authInfo.setAuthSql(whereSql.getSql());
+        }
     }
 
     /**
@@ -35,34 +45,8 @@ public class AuthHelper {
         LOCAL_CUR_AUTHINFO.remove();
     }
 
-    public static AuthQueryInfo getCurSearchInfo() {
+    public static BaseAuthInfo getCurSearchInfo() {
         return LOCAL_CUR_AUTHINFO.get();
-    }
-
-    /**
-     * 刷新权限辅组类AuthHelper信息
-     *
-     * @param simpleAuthInfo
-     */
-    public static AuthQueryInfo refreshAuthHelper(SimpleAuthInfo simpleAuthInfo) {
-        if (LOCAL_CUR_AUTHINFO.get() != null) {
-            synchronized (LOCAL_CUR_AUTHINFO.get()) {
-                return doRefreshAuthHelper(simpleAuthInfo);
-            }
-        } else {
-            return doRefreshAuthHelper(simpleAuthInfo);
-        }
-    }
-
-    private static AuthQueryInfo doRefreshAuthHelper(SimpleAuthInfo simpleAuthInfo) {
-        AuthQueryInfo authQueryInfo = getAuthQueryInfo(simpleAuthInfo);
-        AuthHelper.setCurSearch(authQueryInfo);
-        //设置权限sql where条件
-        if (authQueryInfo.getAuthQuery() != null && simpleAuthInfo.getAuthQuery()) {
-            //todo 是否有必要
-//            simpleAuthInfo.setAuthSql(MyBatisAuthUtils.getAuthSqlWhere(null));
-        }
-        return authQueryInfo;
     }
 
     private static AuthQueryInfo getAuthQueryInfo(SimpleAuthInfo entityWithParam) {

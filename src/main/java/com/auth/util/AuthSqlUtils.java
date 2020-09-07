@@ -1,5 +1,8 @@
 package com.auth.util;
 
+import com.auth.authSql.WhereSql;
+import com.auth.entity.BaseAuthInfo;
+import com.auth.entity.SimpleAuthInfo;
 import com.auth.exception.AuthException;
 import com.auth.exception.UnknownAuthTypeException;
 import com.auth.plugin.Configuration;
@@ -16,52 +19,50 @@ import java.util.Properties;
 public class AuthSqlUtils {
 
     public static String getAuthSql(String sql, String mappedStatementId, Object parameterObject) throws AuthException {
-        AuthQueryInfo curSearchInfo = AuthHelper.getCurSearchInfo();
-        StringBuilder sqlBuilder = new StringBuilder(sql);
-        PageHelperUtil.setNativeSql(sqlBuilder, mappedStatementId, parameterObject);
+        BaseAuthInfo authInfo = AuthHelper.getCurSearchInfo();
+        sql = PageHelperUtil.setNativeSql(sql, mappedStatementId, parameterObject);
         SelectSqlParser selectSqlParser = new SelectSqlParser(sql);
         //获取权限where条件
-        String authSqlWhere;
+        WhereSql authWhere = getAuthWhere();
+        switch (authWhere.getWhereScope()) {
+            case ALL:
+                return sql;
+            case NONE:
+                return Configuration.getEmptySql();
+        }
+        String authSqlWhere = authWhere.getSql();
         switch (Configuration.getAuthType()) {
             case SIMPLE:
                 //权限字段
-                List<Properties> authColumns = curSearchInfo.getAuthColumn();
+                SimpleAuthInfo simpleAuthInfo = (SimpleAuthInfo) authInfo;
+                List<Properties> authColumns = simpleAuthInfo.getAuthColumn();
                 if (authColumns == null || authColumns.isEmpty()) {
-                    if (authColumns == null || authColumns.isEmpty()) {
-                        authColumns = Configuration.getAuthColumn();
-                        curSearchInfo.setAuthColumn(authColumns);
-                    }
-                    if (authColumns == null || authColumns.isEmpty()) {
-                        throw new AuthException("未获取到权限列信息");
-                    }
+                    throw new AuthException("未获取到权限列信息");
                 }
                 if (selectSqlParser.hasColumn(authColumns)) {
                     //select ${AUTH_ALIAS}.* from ( sql ) ${AUTH_ALIAS} where authSql
-                    authSqlWhere = new SimpleAbstractAuthWhereHandler().getWhere(curSearchInfo.getCurTableAlias());
-                    appendOutSideAuth(sqlBuilder);
-                    selectSqlParser = new SelectSqlParser(sqlBuilder.toString());
+                    sql = appendOutSideAuth(sql);
+                    selectSqlParser = new SelectSqlParser(sql);
                     selectSqlParser.setWhere(authSqlWhere);
-                    sqlBuilder = new StringBuilder(selectSqlParser.getParsedSql());
+                    sql = selectSqlParser.getParsedSql();
                 } else {
                     // select ${AUTH_ALIAS}.* from ( sql authSql )${AUTH_ALIAS}
-                    authSqlWhere = new SimpleAbstractAuthWhereHandler().getWhere(curSearchInfo.getCurTableAlias());
                     selectSqlParser.setWhere(authSqlWhere);
-                    sqlBuilder = new StringBuilder(selectSqlParser.getParsedSql());
-                    appendOutSideAuth(sqlBuilder);
+                    sql = selectSqlParser.getParsedSql();
+                    sql = appendOutSideAuth(sql);
                 }
                 break;
             case COMPLEX:
-                authSqlWhere = new ComplexAbstractAuthWhereHandler().getWhere(Configuration.getAuthColumnTableAlias());
-                appendOutSideAuth(sqlBuilder);
-                selectSqlParser = new SelectSqlParser(sqlBuilder.toString());
+                //todo 乱写的，待实现
+                sql = appendOutSideAuth(sql);
+                selectSqlParser = new SelectSqlParser(sql);
                 selectSqlParser.setWhere(authSqlWhere);
-                sqlBuilder = new StringBuilder(selectSqlParser.getParsedSql());
+                sql = selectSqlParser.getParsedSql();
                 break;
             default:
                 throw new UnknownAuthTypeException("未知权限查询类型");
         }
-        PageHelperUtil.sufHandler(sqlBuilder, mappedStatementId, parameterObject);
-        return sqlBuilder.toString();
+        return PageHelperUtil.sufHandler(sql, mappedStatementId, parameterObject);
     }
 
     /**
@@ -69,8 +70,22 @@ public class AuthSqlUtils {
      *
      * @return
      */
-    private static void appendOutSideAuth(StringBuilder sqlBuffer) {
-        sqlBuffer.insert(0, "select " + Configuration.getAuthTableAlias() + ".* from (").append(") " + Configuration.getAuthTableAlias());
+    private static String appendOutSideAuth(String sql) {
+        return "select " + Configuration.getAuthTableSign() + ".* from (" + sql + ") " + Configuration.getAuthTableSign();
+    }
+
+    public static WhereSql getAuthWhere() throws AuthException {
+        BaseAuthInfo authInfo = AuthHelper.getCurSearchInfo();
+        switch (Configuration.getAuthType()) {
+            case SIMPLE:
+                SimpleAuthInfo simpleAuthInfo = (SimpleAuthInfo) authInfo;
+                //权限字段
+                return new SimpleAbstractAuthWhereHandler().getWhere(simpleAuthInfo.getAuthTableAlias());
+            case COMPLEX:
+                return new ComplexAbstractAuthWhereHandler().getWhere(Configuration.getAuthColumnTableAlias());
+            default:
+                throw new UnknownAuthTypeException("未知权限查询类型");
+        }
     }
 
     public static void main(String[] args) {

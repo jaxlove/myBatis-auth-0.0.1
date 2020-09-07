@@ -1,6 +1,6 @@
 package com.mybatis.dao;
 
-import com.auth.util.AuthQueryInfo;
+import com.auth.entity.BaseAuthInfo;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -8,6 +8,6 @@ import java.util.List;
 @Mapper
 public interface TestMapper {
 
-    List test(AuthQueryInfo authQueryInfo);
+    List test(BaseAuthInfo authQueryInfo);
 
 }

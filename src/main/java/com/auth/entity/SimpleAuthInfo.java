@@ -1,10 +1,12 @@
 package com.auth.entity;
 
 
+import com.auth.plugin.Configuration;
 import com.auth.util.RelationTypeEnum;
 
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * @author wangdejun
@@ -30,6 +32,19 @@ public class SimpleAuthInfo extends BaseAuthInfo {
      */
     private String authTableAlias;
 
+    /**
+     * 数据权限
+     */
+    private Set dataScope;
+
+
+    public Set getDataScope() {
+        return dataScope;
+    }
+
+    public void setDataScope(Set dataScope) {
+        this.dataScope = dataScope;
+    }
 
     public String getAuthTableAlias() {
         return authTableAlias;
@@ -40,6 +55,9 @@ public class SimpleAuthInfo extends BaseAuthInfo {
     }
 
     public List<Properties> getAuthColumn() {
+        if (authColumn == null || authColumn.isEmpty()) {
+            this.setAuthColumn(Configuration.getAuthColumn());
+        }
         return authColumn;
     }
 

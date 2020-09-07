@@ -1,7 +1,8 @@
 package com;
 
+import com.auth.entity.SimpleAuthInfo;
+import com.auth.exception.AuthException;
 import com.auth.util.AuthHelper;
-import com.auth.util.AuthQueryInfo;
 import com.auth.util.RelationTypeEnum;
 import com.mybatis.dao.TestMapper;
 import org.springframework.boot.SpringApplication;
@@ -18,16 +19,16 @@ import java.util.HashSet;
 @SpringBootApplication
 public class Application {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws AuthException {
         ConfigurableApplicationContext run = SpringApplication.run(Application.class);
         TestMapper bean = run.getBean(TestMapper.class);
-        AuthQueryInfo authQueryInfo = new AuthQueryInfo();
+        SimpleAuthInfo authQueryInfo = new SimpleAuthInfo();
         AuthHelper.setCurSearch(authQueryInfo);
         HashSet hashSet = new HashSet();
         hashSet.add(340100);
         authQueryInfo.setDataScope(hashSet);
         authQueryInfo.setRelationTypeEnum(RelationTypeEnum.AND);
-        authQueryInfo.setAuthTableAlias("a");
+//        authQueryInfo.setAuthTableAlias("a");
         System.out.println(bean.test(authQueryInfo).size());
     }
 

@@ -8,17 +8,17 @@ package com.auth.util.pagehelper;
 public class PostgreSQLDialect implements DialectHandler {
 
     @Override
-    public void getNativeSelectSql(StringBuilder sql) {
-
+    public String getNativeSelectSql(String sql) {
+        return null;
     }
 
     @Override
-    public void getNativeCountSql(StringBuilder sql) {
-
+    public String getNativeCountSql(String sql) {
+        return null;
     }
 
     @Override
-    public void sufHandler(StringBuilder sql) {
-
+    public String sufHandler(String sql) {
+        return null;
     }
 }

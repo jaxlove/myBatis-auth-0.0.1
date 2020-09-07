@@ -66,7 +66,7 @@ public class Configuration {
 
     private static boolean initSuccess = true;
 
-    private static final String AUTH_TABLE_ALIAS = "AUTH_TABLE_ALIAS";
+    private static final String AUTH_TABLE_SIGN = "AUTH_TABLE_ALIAS";
 
     public static Boolean getAuthColumnCheck() {
         return authColumnCheck;
@@ -76,8 +76,8 @@ public class Configuration {
         Configuration.authColumnCheck = authColumnCheck;
     }
 
-    public static String getAuthTableAlias() {
-        return AUTH_TABLE_ALIAS;
+    public static String getAuthTableSign() {
+        return AUTH_TABLE_SIGN;
     }
 
     public static boolean isInitSuccess() {
