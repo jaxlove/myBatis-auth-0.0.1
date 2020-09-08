@@ -37,7 +37,7 @@ public abstract class AbstractAuthWhereHandler implements AuthWhereHandler {
         if (authInfo == null || authInfo.getAuthQuery() == null || !authInfo.getAuthQuery()) {
             return Scope.ALL;
         }
-        Boolean allDataSign = authInfo.isAllDataSign();
+        Boolean allDataSign = authInfo.getAllDataSign();
         //超管，设置为全部数据权限
         if (allDataSign != null && allDataSign) {
             return Scope.ALL;

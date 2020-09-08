@@ -20,8 +20,6 @@ public class AuthSqlUtils {
 
     public static ScopeSql getAuthSql(String sql, String mappedStatementId, Object parameterObject) throws AuthException {
         BaseAuthInfo authInfo = AuthHelper.getCurSearchInfo();
-        sql = PageHelperUtil.getNativeSql(sql, mappedStatementId, parameterObject);
-        SelectSqlParser selectSqlParser = new SelectSqlParser(sql);
         //获取权限where条件
         ScopeSql authWhere = authInfo.getAuthScopSql();
         if (authWhere == null) {
@@ -33,6 +31,8 @@ public class AuthSqlUtils {
             case NONE:
                 return new ScopeSql(Scope.NONE, Configuration.getEmptySql());
         }
+        sql = PageHelperUtil.getNativeSql(sql, mappedStatementId, parameterObject);
+        SelectSqlParser selectSqlParser = new SelectSqlParser(sql);
         String authSqlWhere = authWhere.getSql();
         switch (Configuration.getAuthType()) {
             case SIMPLE:

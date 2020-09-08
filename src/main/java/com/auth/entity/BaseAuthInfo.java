@@ -19,6 +19,9 @@ public class BaseAuthInfo {
      */
     private Boolean authQuery = true;
 
+    /**
+     * 拼接好的权限 where条件
+     */
     private ScopeSql authScopSql;
 
     /**
@@ -48,10 +51,6 @@ public class BaseAuthInfo {
     }
 
     public Boolean getAllDataSign() {
-        return allDataSign;
-    }
-
-    public Boolean isAllDataSign() {
         return allDataSign;
     }
 

@@ -34,9 +34,9 @@ public class SimpleAbstractAuthWhereHandler extends AbstractAuthWhereHandler {
             //仅支持基础类型和字符串
             String type = authColumn.getProperty("type");
             singleColumnAuth = getAliasAndColumnName(tableNameAlias, authColumn) + " in (";
-            if ("Number".equals(type)) {
+            if ("Number".equalsIgnoreCase(type)) {
                 singleColumnAuth += StringUtils.join(authValue.toArray(), ",");
-            } else if ("String".equals(type)) {
+            } else if ("String".equalsIgnoreCase(type)) {
                 List<String> authValueStrList = authValue.stream().map(t -> "'" + t + "'").collect(Collectors.toList());
                 singleColumnAuth += StringUtils.join(authValueStrList, ",");
             } else {
