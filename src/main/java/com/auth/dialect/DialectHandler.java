@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-package com.auth.util.pagehelper;
+package com.auth.dialect;
 
 /**
  * 数据库方言，针对不同数据库进行实现
@@ -30,10 +30,7 @@ package com.auth.util.pagehelper;
  * @author liuzh
  */
 public interface DialectHandler {
-    String getNativeSelectSql(String sql);
 
-    String getNativeCountSql(String sql);
-
-    String sufHandler(String sql);
+    String getEmptySql();
 
 }

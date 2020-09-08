@@ -1,4 +1,4 @@
-package com.auth.util.pagehelper;
+package com.auth.dialect;
 
 
 import org.slf4j.Logger;
@@ -24,7 +24,7 @@ public class DialectUtil {
 
     static {
         //注册别名
-        registerDialectAlias("postgresql", PostgreSQLDialect.class);
+        registerDialectAlias("postgresql", HsqldbDialect.class);
         registerDialectAlias("oracle", OracleDialect.class);
 //        registerDialectAlias("hsqldb", HsqldbDialect.class);
 //        registerDialectAlias("h2", HsqldbDialect.class);

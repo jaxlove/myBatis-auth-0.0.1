@@ -1,4 +1,6 @@
-package com.auth.util.pagehelper;
+package com.auth.dialect;
+
+import com.auth.dialect.DialectHandler;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -8,7 +10,7 @@ import java.util.regex.Pattern;
  * @description: oracle pagehelper处理类
  * @date 2020/9/4 11:12
  */
-public class OracleDialect implements DialectHandler {
+public class OracleDialect implements DialectHandler,PageHelperHanlder {
 
     //分页sql的前面的sql
     private static ThreadLocal<String> pageHelperPreSqlThread = ThreadLocal.withInitial(() -> "");
@@ -17,7 +19,7 @@ public class OracleDialect implements DialectHandler {
     private static ThreadLocal<String> pageHelperSufSqlThread = ThreadLocal.withInitial(() -> "");
 
     @Override
-    public String getNativeSelectSql(String sql) {
+    public String removePagehelperSelectSql(String sql) {
         Pattern pattern = Pattern.compile("\\)(\\s){0,}tmp_page(.*)", Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(sql);
         String originSql = null;
@@ -37,15 +39,20 @@ public class OracleDialect implements DialectHandler {
     }
 
     @Override
-    public String getNativeCountSql(String sql) {
+    public String removePagehelperCountSql(String sql) {
         return null;
     }
 
     @Override
-    public String sufHandler(String sql) {
+    public String selectSufHandler(String sql) {
         sql = pageHelperPreSqlThread.get() + sql + pageHelperSufSqlThread.get();
         pageHelperPreSqlThread.remove();
         pageHelperSufSqlThread.remove();
         return sql;
+    }
+
+    @Override
+    public String getEmptySql() {
+        return "select 0 from dual where 1=0";
     }
 }

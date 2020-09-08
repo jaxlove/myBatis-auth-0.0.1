@@ -6,7 +6,6 @@ import com.auth.entity.SimpleAuthInfo;
 import com.auth.exception.AuthException;
 import com.auth.exception.UnknownAuthTypeException;
 import com.auth.plugin.Configuration;
-import com.auth.util.pagehelper.PageHelperUtil;
 
 import java.util.List;
 import java.util.Properties;

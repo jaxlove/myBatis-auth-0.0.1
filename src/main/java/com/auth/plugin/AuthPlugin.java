@@ -2,16 +2,18 @@ package com.auth.plugin;
 
 import com.auth.authSql.Scope;
 import com.auth.authSql.ScopeSql;
+import com.auth.dialect.DialectUtil;
 import com.auth.entity.BaseAuthInfo;
 import com.auth.exception.AuthException;
 import com.auth.exception.UnKownDialect;
 import com.auth.exception.UnknownSqlTypeException;
-import com.auth.util.*;
-import com.auth.util.pagehelper.DialectUtil;
+import com.auth.util.AuthHelper;
+import com.auth.util.MyBatisAuthUtils;
+import com.auth.util.RelationTypeEnum;
+import com.auth.util.StringUtils;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.reflection.MetaObject;
@@ -21,7 +23,9 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * @author wangdejun
@@ -89,6 +93,7 @@ public class AuthPlugin implements Interceptor {
             throw new UnKownDialect("未知dialect：" + dialect);
         }
         Configuration.setDialect(dialect);
+        Configuration.setEmptySql(DialectUtil.getDialect(dialect).getEmptySql());
         String sqlType = properties.getProperty("sqlType");
         if (AuthType.COMPLEX.toString().equalsIgnoreCase(sqlType)) {
             Configuration.setAuthType(AuthType.COMPLEX);

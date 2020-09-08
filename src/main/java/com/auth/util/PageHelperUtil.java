@@ -1,5 +1,7 @@
-package com.auth.util.pagehelper;
+package com.auth.util;
 
+import com.auth.dialect.DialectHandler;
+import com.auth.dialect.DialectUtil;
 import com.auth.plugin.Configuration;
 import com.auth.util.SelectSqlParser;
 import com.auth.util.StringUtils;
@@ -30,7 +32,7 @@ public class PageHelperUtil {
         if (!inited.getAndSet(true)) {
             init();
         }
-        return dialectHandler.sufHandler(sql);
+        return dialectHandler.selectSufHandler(sql);
     }
 
     /**
@@ -44,7 +46,7 @@ public class PageHelperUtil {
             init();
         }
         if (isPageSelect(parameterObject)) {
-            return dialectHandler.getNativeSelectSql(sql);
+            return dialectHandler.removePagehelperSelectSql(sql);
         }
         return sql;
 

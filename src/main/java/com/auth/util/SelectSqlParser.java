@@ -154,7 +154,7 @@ public class SelectSqlParser {
         if (StringUtils.isNotBlank(whereSql)) {
             SqlSegment whereSqlSegment = segments.get(2);
             String parsedSqlSegment = whereSqlSegment.getParsedSqlSegment();
-            SqlSegment sqlSegment = new SqlSegment("( where | on | having )(.+)( group by | order by | " + END_SIGNAL + ")", "( and | or )");
+            SqlSegment sqlSegment = new SqlSegment("( where | on | having )(.+)( group by | limit | order by | " + END_SIGNAL + ")", "( and | or )");
             if (StringUtils.isBlank(parsedSqlSegment)) {
                 sqlSegment.parse(" where " + whereSql + " " + END_SIGNAL);
             } else {
