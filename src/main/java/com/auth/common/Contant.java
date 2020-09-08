@@ -1,4 +1,4 @@
-package com.auth.util;
+package com.auth.common;
 
 /**
  * @author wangdejun

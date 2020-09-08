@@ -1,5 +1,7 @@
 package com.auth.entity;
 
+import com.auth.authSql.ScopeSql;
+
 /**
  * @author wangdejun
  * @description: 权限信息
@@ -17,8 +19,10 @@ public class BaseAuthInfo {
      */
     private Boolean authQuery = true;
 
+    private ScopeSql authScopSql;
+
     /**
-     * 拼接好的权限sql
+     * 拼接好的权限 where条件
      * 全部权限为 null
      * simple格式为：(authTableAlias.authColumn in (dataScope) relationTypeEnum.operate authTableAlias.authColumn in (dataScope))
      * complex格式为：()
@@ -29,6 +33,23 @@ public class BaseAuthInfo {
      * 是否查询全部数据
      */
     private Boolean allDataSign = false;
+
+    public ScopeSql getAuthScopSql() {
+        return authScopSql;
+    }
+
+    public void setAuthScopSql(ScopeSql authScopSql) {
+        this.authScopSql = authScopSql;
+        if (authScopSql != null) {
+            this.setAuthSql(authScopSql.getSql());
+        } else {
+            this.setAuthSql(null);
+        }
+    }
+
+    public Boolean getAllDataSign() {
+        return allDataSign;
+    }
 
     public Boolean isAllDataSign() {
         return allDataSign;
@@ -58,7 +79,7 @@ public class BaseAuthInfo {
         return authSql;
     }
 
-    public void setAuthSql(String authSql) {
+    private void setAuthSql(String authSql) {
         this.authSql = authSql;
     }
 }

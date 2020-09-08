@@ -1,15 +1,17 @@
 package com.auth.plugin;
 
+import com.auth.authSql.Scope;
+import com.auth.authSql.ScopeSql;
+import com.auth.entity.BaseAuthInfo;
 import com.auth.exception.AuthException;
 import com.auth.exception.UnKownDialect;
 import com.auth.exception.UnknownSqlTypeException;
-import com.auth.util.MyBatisAuthUtils;
-import com.auth.util.RelationTypeEnum;
+import com.auth.util.*;
 import com.auth.util.pagehelper.DialectUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
+import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.reflection.MetaObject;
@@ -19,9 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * @author wangdejun
@@ -39,8 +39,10 @@ public class AuthPlugin implements Interceptor {
         if (!Configuration.isInitSuccess()) {
             return invocation.proceed();
         }
-        //将boundSql里的sql，拼接权限语句
-        setAuthBoundSql(target);
+        if (needSetAuth()) {
+            //将boundSql里的sql，拼接权限语句
+            setAuthBoundSql(target);
+        }
         return invocation.proceed();
     }
 
@@ -61,6 +63,24 @@ public class AuthPlugin implements Interceptor {
             logger.error("权限插件异常：", e);
             Configuration.setInitSuccess(false);
         }
+    }
+
+    private boolean needSetAuth() {
+        //没有权限查询信息，权限查询为空或者为false,自动拼接权限sql为空或者false，返回原sql
+        //authInfo 新增同一线程可能需要使用多次（数据总数查询，列表查询），不可以将信息从curSearchInfo信息移除，移除操作需要自己实现
+        BaseAuthInfo authInfo = AuthHelper.getCurSearchInfo();
+        if (authInfo == null || authInfo.getAuthQuery() == null || !authInfo.getAuthQuery()) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean autoAppend() {
+        BaseAuthInfo authInfo = AuthHelper.getCurSearchInfo();
+        if (authInfo.getAutoAppendAuth() == null || !authInfo.getAutoAppendAuth()) {
+            return false;
+        }
+        return true;
     }
 
     private void propertiesCheck(Properties properties) throws AuthException {
@@ -108,15 +128,23 @@ public class AuthPlugin implements Interceptor {
         StatementHandler nativeHandler = getNativeHandler((StatementHandler) handler);
         MetaObject statementHandlerMetaObject = SystemMetaObject.forObject(nativeHandler);
         BoundSql boundSql = (BoundSql) statementHandlerMetaObject.getValue("boundSql");
-        MappedStatement mappedStatement = (MappedStatement) statementHandlerMetaObject.getValue("mappedStatement");
+        MappedStatement ms = (MappedStatement) statementHandlerMetaObject.getValue("mappedStatement");
         //判断是否select语句
-        if (mappedStatement.getSqlCommandType() != SqlCommandType.SELECT) {
+        if (ms.getSqlCommandType() != SqlCommandType.SELECT) {
             return;
         }
         MetaObject metaObject = SystemMetaObject.forObject(boundSql);
-        String mappedStatementId = mappedStatement.getId();
+        String mappedStatementId = ms.getId();
         Object parameterObject = boundSql.getParameterObject();
-        metaObject.setValue("sql", MyBatisAuthUtils.getAuthSql(metaObject.getValue("sql").toString(), mappedStatementId, parameterObject));
+        ScopeSql authSql;
+        if (autoAppend()) {
+            //todo 每次都要拼接，影响效率，可学习pagehelper，生成个新的MappedStatement，注入参数，缓存起来
+            authSql = MyBatisAuthUtils.getAuthSql(metaObject.getValue("sql").toString(), mappedStatementId, parameterObject);
+        } else {
+            authSql = new ScopeSql(Scope.ALL, metaObject.getValue("sql").toString());
+        }
+        metaObject.setValue("sql", authSql.getSql());
+
     }
 
     //代理类处理

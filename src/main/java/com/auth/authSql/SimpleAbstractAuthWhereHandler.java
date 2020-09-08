@@ -1,10 +1,10 @@
-package com.auth.util;
+package com.auth.authSql;
 
 import com.auth.entity.SimpleAuthInfo;
 import com.auth.exception.AuthException;
 import com.auth.exception.UnSurpportJdbcType;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
+import com.auth.util.RelationTypeEnum;
+import com.auth.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +47,7 @@ public class SimpleAbstractAuthWhereHandler extends AbstractAuthWhereHandler {
                 authAuthList.add(singleColumnAuth);
             }
         }
-        if (CollectionUtils.isEmpty(authAuthList)) {
+        if (authAuthList == null || authAuthList.isEmpty()) {
             return null;
         }
         if (authAuthList.size() == 1) {

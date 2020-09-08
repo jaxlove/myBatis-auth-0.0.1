@@ -2,7 +2,7 @@ package com.auth.util.pagehelper;
 
 import com.auth.plugin.Configuration;
 import com.auth.util.SelectSqlParser;
-import org.apache.commons.lang3.StringUtils;
+import com.auth.util.StringUtils;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -39,7 +39,7 @@ public class PageHelperUtil {
      * @param sql
      * @return
      */
-    public static String setNativeSql(String sql, String mappedStatementId, Object parameterObject) {
+    public static String getNativeSql(String sql, String mappedStatementId, Object parameterObject) {
         if (!inited.getAndSet(true)) {
             init();
         }
@@ -67,8 +67,8 @@ public class PageHelperUtil {
      * @return
      */
     private static boolean isPageSelect(Object parameterObject) {
-        if (parameterObject.getClass().isAssignableFrom(Map.class) &&
-                (((Map) parameterObject).containsKey("First__PageHelper") || ((Map) parameterObject).containsKey("Second__PageHelper"))) {
+        if (Map.class.isAssignableFrom(parameterObject.getClass()) &&
+                (((Map) parameterObject).containsKey("First_PageHelper") || ((Map) parameterObject).containsKey("Second_PageHelper"))) {
             return true;
         }
         return false;

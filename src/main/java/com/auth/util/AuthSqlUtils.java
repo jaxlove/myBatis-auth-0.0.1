@@ -1,6 +1,6 @@
 package com.auth.util;
 
-import com.auth.authSql.WhereSql;
+import com.auth.authSql.*;
 import com.auth.entity.BaseAuthInfo;
 import com.auth.entity.SimpleAuthInfo;
 import com.auth.exception.AuthException;
@@ -18,17 +18,20 @@ import java.util.Properties;
  */
 public class AuthSqlUtils {
 
-    public static String getAuthSql(String sql, String mappedStatementId, Object parameterObject) throws AuthException {
+    public static ScopeSql getAuthSql(String sql, String mappedStatementId, Object parameterObject) throws AuthException {
         BaseAuthInfo authInfo = AuthHelper.getCurSearchInfo();
-        sql = PageHelperUtil.setNativeSql(sql, mappedStatementId, parameterObject);
+        sql = PageHelperUtil.getNativeSql(sql, mappedStatementId, parameterObject);
         SelectSqlParser selectSqlParser = new SelectSqlParser(sql);
         //获取权限where条件
-        WhereSql authWhere = getAuthWhere();
-        switch (authWhere.getWhereScope()) {
+        ScopeSql authWhere = authInfo.getAuthScopSql();
+        if (authWhere == null) {
+            getAuthWhere();
+        }
+        switch (authWhere.getScope()) {
             case ALL:
-                return sql;
+                return new ScopeSql(Scope.ALL, sql);
             case NONE:
-                return Configuration.getEmptySql();
+                return new ScopeSql(Scope.NONE, Configuration.getEmptySql());
         }
         String authSqlWhere = authWhere.getSql();
         switch (Configuration.getAuthType()) {
@@ -62,7 +65,8 @@ public class AuthSqlUtils {
             default:
                 throw new UnknownAuthTypeException("未知权限查询类型");
         }
-        return PageHelperUtil.sufHandler(sql, mappedStatementId, parameterObject);
+        String authSql = PageHelperUtil.sufHandler(sql, mappedStatementId, parameterObject);
+        return new ScopeSql(Scope.AUTH, authSql);
     }
 
     /**
@@ -74,18 +78,22 @@ public class AuthSqlUtils {
         return "select " + Configuration.getAuthTableSign() + ".* from (" + sql + ") " + Configuration.getAuthTableSign();
     }
 
-    public static WhereSql getAuthWhere() throws AuthException {
+    public static ScopeSql getAuthWhere() throws AuthException {
         BaseAuthInfo authInfo = AuthHelper.getCurSearchInfo();
+        AuthWhereHandlerDelete authWhereHandlerDelete;
+        SimpleAuthInfo simpleAuthInfo = (SimpleAuthInfo) authInfo;
         switch (Configuration.getAuthType()) {
             case SIMPLE:
-                SimpleAuthInfo simpleAuthInfo = (SimpleAuthInfo) authInfo;
                 //权限字段
-                return new SimpleAbstractAuthWhereHandler().getWhere(simpleAuthInfo.getAuthTableAlias());
+                authWhereHandlerDelete = new AuthWhereHandlerDelete(new SimpleAbstractAuthWhereHandler());
+                break;
             case COMPLEX:
-                return new ComplexAbstractAuthWhereHandler().getWhere(Configuration.getAuthColumnTableAlias());
+                authWhereHandlerDelete = new AuthWhereHandlerDelete(new ComplexAbstractAuthWhereHandler());
+                break;
             default:
                 throw new UnknownAuthTypeException("未知权限查询类型");
         }
+        return authWhereHandlerDelete.getWhere(simpleAuthInfo.getAuthTableAlias());
     }
 
     public static void main(String[] args) {

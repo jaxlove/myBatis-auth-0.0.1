@@ -1,6 +1,6 @@
 package com.auth.authSql;
 
-public enum WhereScope {
+public enum Scope {
 
     AUTH, ALL, NONE
 }

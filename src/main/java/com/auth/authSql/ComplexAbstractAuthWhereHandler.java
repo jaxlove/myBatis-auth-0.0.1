@@ -1,6 +1,5 @@
-package com.auth.util;
+package com.auth.authSql;
 
-import com.auth.exception.AuthException;
 import com.auth.plugin.Configuration;
 
 /**
@@ -11,7 +10,7 @@ import com.auth.plugin.Configuration;
 public class ComplexAbstractAuthWhereHandler extends AbstractAuthWhereHandler {
 
     @Override
-    protected String getAuthWhere(String tableAlias) throws AuthException {
+    protected String getAuthWhere(String tableAlias) {
         String appendAuthSql = Configuration.getAppendAuthSql();
         if (!appendAuthSql.trim().startsWith("(")) {
             return "(" + appendAuthSql + ")";

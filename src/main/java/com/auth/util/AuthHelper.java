@@ -1,6 +1,6 @@
 package com.auth.util;
 
-import com.auth.authSql.WhereSql;
+import com.auth.authSql.ScopeSql;
 import com.auth.entity.AuthQueryInfo;
 import com.auth.entity.BaseAuthInfo;
 import com.auth.entity.SimpleAuthInfo;
@@ -25,8 +25,8 @@ public class AuthHelper {
         LOCAL_CUR_AUTHINFO.set(authInfo);
         //设置权限sql where条件
         if (authInfo.getAuthQuery() != null && authInfo.getAuthQuery()) {
-            WhereSql whereSql = AuthSqlUtils.getAuthWhere();
-            authInfo.setAuthSql(whereSql.getSql());
+            ScopeSql scopeSql = AuthSqlUtils.getAuthWhere();
+            authInfo.setAuthScopSql(scopeSql);
         }
     }
 

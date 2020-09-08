@@ -1,8 +1,6 @@
 import org.apache.ibatis.javassist.ClassPool;
 import org.apache.ibatis.javassist.CtClass;
 import org.apache.ibatis.javassist.CtMethod;
-import org.junit.Test;
-import sun.misc.Launcher;
 
 /**
  * @author wangdejun
@@ -11,7 +9,6 @@ import sun.misc.Launcher;
  */
 public class JavasisstTest {
 
-    @Test
     public void overrideMethod() {
         ClassPool classPool = ClassPool.getDefault();
         try {

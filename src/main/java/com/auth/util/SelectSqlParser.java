@@ -1,9 +1,7 @@
 package com.auth.util;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.auth.common.Contant;
+import com.auth.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +17,6 @@ import java.util.stream.Collectors;
  * @date 2020/2/3 14:01
  */
 public class SelectSqlParser {
-
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
      * sql结束标识
@@ -155,7 +151,7 @@ public class SelectSqlParser {
     }
 
     public void setWhere(String whereSql) {
-        if(StringUtils.isNotBlank(whereSql)){
+        if (StringUtils.isNotBlank(whereSql)) {
             SqlSegment whereSqlSegment = segments.get(2);
             String parsedSqlSegment = whereSqlSegment.getParsedSqlSegment();
             SqlSegment sqlSegment = new SqlSegment("( where | on | having )(.+)( group by | order by | " + END_SIGNAL + ")", "( and | or )");
@@ -178,7 +174,7 @@ public class SelectSqlParser {
      */
     public boolean hasColumn(List<Properties> columns) {
         List<SelectSqlParser.SelectColumn> selectColumn = getSelectColumn();
-        if (CollectionUtils.isNotEmpty(selectColumn)) {
+        if (selectColumn != null && !selectColumn.isEmpty()) {
             Optional<SelectColumn> hasAuthColumn = selectColumn.stream().filter(t -> {
                 for (Properties property : columns) {
                     if (t.getColumnAlias().indexOf("*") > -1) {

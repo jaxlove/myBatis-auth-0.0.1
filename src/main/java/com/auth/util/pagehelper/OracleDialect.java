@@ -30,7 +30,7 @@ public class OracleDialect implements DialectHandler {
         String pageHelperPreSql = "";
         for (int i = 0; i < count; i++) {
             pageHelperPreSql += originSql.substring(0, originSql.indexOf("(") + 1);
-            originSql.substring(originSql.indexOf("(") + 1);
+            originSql = originSql.substring(originSql.indexOf("(") + 1);
         }
         pageHelperPreSqlThread.set(pageHelperPreSql);
         return originSql;

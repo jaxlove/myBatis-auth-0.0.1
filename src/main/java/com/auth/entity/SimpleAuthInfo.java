@@ -66,7 +66,7 @@ public class SimpleAuthInfo extends BaseAuthInfo {
     }
 
     public RelationTypeEnum getRelationTypeEnum() {
-        return relationTypeEnum;
+        return relationTypeEnum == null ? Configuration.getRelationTypeEnum():relationTypeEnum;
     }
 
     public void setRelationTypeEnum(RelationTypeEnum relationTypeEnum) {
