@@ -24,8 +24,8 @@ public class DialectUtil {
 
     static {
         //注册别名
-        registerDialectAlias("postgresql", HsqldbDialect.class);
-        registerDialectAlias("oracle", OracleDialect.class);
+        registerDialectAlias("postgresql", HsqldbAuthDialect.class);
+        registerDialectAlias("oracle", OracleAuthDialect.class);
 //        registerDialectAlias("hsqldb", HsqldbDialect.class);
 //        registerDialectAlias("h2", HsqldbDialect.class);
 

@@ -1,10 +1,8 @@
 package com.auth.util;
 
-import com.auth.dialect.DialectHandler;
 import com.auth.dialect.DialectUtil;
+import com.auth.dialect.PageHelperHanlder;
 import com.auth.plugin.Configuration;
-import com.auth.util.SelectSqlParser;
-import com.auth.util.StringUtils;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -16,14 +14,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class PageHelperUtil {
 
-    private static DialectHandler dialectHandler;
+    private static PageHelperHanlder pageHelperHanlder;
 
     private static AtomicBoolean inited = new AtomicBoolean(false);
 
     private static void init() {
         String dialect = Configuration.getDialect();
         if (StringUtils.isNotBlank(dialect)) {
-            dialectHandler = DialectUtil.getDialect(dialect);
+            pageHelperHanlder = DialectUtil.getDialect(dialect);
         }
     }
 
@@ -32,7 +30,7 @@ public class PageHelperUtil {
         if (!inited.getAndSet(true)) {
             init();
         }
-        return dialectHandler.selectSufHandler(sql);
+        return pageHelperHanlder.selectSufHandler(sql);
     }
 
     /**
@@ -46,7 +44,7 @@ public class PageHelperUtil {
             init();
         }
         if (isPageSelect(parameterObject)) {
-            return dialectHandler.removePagehelperSelectSql(sql);
+            return pageHelperHanlder.removePagehelperSelectSql(sql);
         }
         return sql;
 

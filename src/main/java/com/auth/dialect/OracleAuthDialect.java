@@ -1,7 +1,5 @@
 package com.auth.dialect;
 
-import com.auth.dialect.DialectHandler;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,7 +8,7 @@ import java.util.regex.Pattern;
  * @description: oracle pagehelper处理类
  * @date 2020/9/4 11:12
  */
-public class OracleDialect implements DialectHandler,PageHelperHanlder {
+public class OracleAuthDialect implements DialectHandler {
 
     //分页sql的前面的sql
     private static ThreadLocal<String> pageHelperPreSqlThread = ThreadLocal.withInitial(() -> "");
