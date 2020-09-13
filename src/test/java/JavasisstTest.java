@@ -16,7 +16,7 @@ public class JavasisstTest {
             CtMethod method = ctClass.getDeclaredMethod("test2");
             method.setBody("new com.Demo2().test2($1);");
 //            ctClass.writeFile();
-            //wdjtodo 该使用哪个类加载器，待确定
+            //todo 该使用哪个类加载器，待确定
             ctClass.toClass(this.getClass().getClassLoader());
         } catch (Exception e) {
             e.printStackTrace();

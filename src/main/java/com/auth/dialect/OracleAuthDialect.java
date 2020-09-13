@@ -1,5 +1,7 @@
 package com.auth.dialect;
 
+import com.auth.exception.AuthException;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,9 +38,10 @@ public class OracleAuthDialect implements DialectHandler {
         return originSql;
     }
 
+    //fix me 未实现代码
     @Override
-    public String removePagehelperCountSql(String sql) {
-        return null;
+    public String removePagehelperCountSql(String sql) throws AuthException {
+        throw new AuthException("unimplemented method");
     }
 
     @Override

@@ -1,11 +1,7 @@
 package com.auth.util;
 
-import com.auth.authSql.Scope;
 import com.auth.authSql.ScopeSql;
-import com.auth.entity.BaseAuthInfo;
 import com.auth.exception.AuthException;
-import com.auth.plugin.Configuration;
-import com.auth.util.StringUtils;
 
 /**
  * @author wangdejun
@@ -14,9 +10,7 @@ import com.auth.util.StringUtils;
  */
 public class MyBatisAuthUtils {
 
-
-    private static final String EMPTY_SQL = Configuration.getEmptySql();
-
+    //todo 如果返回类型是int等基本类型，不可返回null，应返回 0，待实现
     public static ScopeSql getAuthSql(String sql, String mappedStatementId, Object parameterObject) throws AuthException {
         return AuthSqlUtils.getAuthSql(sql, mappedStatementId, parameterObject);
     }

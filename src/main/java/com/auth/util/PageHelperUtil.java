@@ -2,6 +2,7 @@ package com.auth.util;
 
 import com.auth.dialect.DialectUtil;
 import com.auth.dialect.PageHelperHanlder;
+import com.auth.exception.AuthException;
 import com.auth.plugin.Configuration;
 
 import java.util.Map;
@@ -39,12 +40,14 @@ public class PageHelperUtil {
      * @param sql
      * @return
      */
-    public static String getNativeSql(String sql, String mappedStatementId, Object parameterObject) {
+    public static String getNativeSql(String sql, String mappedStatementId, Object parameterObject) throws AuthException {
         if (!inited.getAndSet(true)) {
             init();
         }
         if (isPageSelect(parameterObject)) {
             return pageHelperHanlder.removePagehelperSelectSql(sql);
+        } else if (isPageCount(sql)) {
+            return pageHelperHanlder.removePagehelperCountSql(sql);
         }
         return sql;
 
@@ -74,11 +77,11 @@ public class PageHelperUtil {
         return false;
     }
 
-    private static boolean isPageCount(StringBuilder sql) {
-        SelectSqlParser selectSqlParser = new SelectSqlParser(sql.toString());
+    private static boolean isPageCount(String sql) {
+        SelectSqlParser selectSqlParser = new SelectSqlParser(sql);
         String simpleSql = selectSqlParser.getSimpleSql();
-        // select count(0) from #sub_sql# tmp_cout
-        if (simpleSql.matches("select(\\s+)count\\((.+)\\)t(\\s+)fromt(\\s+)#sub_sql#t(\\s+)tmp_count")) {
+        // select count(0) from SUB_SQL_SIGNAL
+        if (simpleSql.matches("select(\\s+)count\\((.+)\\)t(\\s+)from(\\s+)" + SelectSqlParser.SUB_SQL_SIGNAL + "(\\s+)(.*)")) {
             return true;
         }
         return false;

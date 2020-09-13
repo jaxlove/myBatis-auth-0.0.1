@@ -2,7 +2,7 @@ package com.auth.authSql;
 
 /**
  * @author wangdejun
- * @description: TODO description
+ * @description: 带权限范围的sql
  * @date 2020/9/7 11:04
  */
 public class ScopeSql {

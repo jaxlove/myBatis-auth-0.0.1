@@ -6,7 +6,6 @@ import java.util.Objects;
 
 /**
  * @author wangdejun
- * @description: TODO description
  * @date 2020/9/8 8:24
  */
 public class StringUtils {

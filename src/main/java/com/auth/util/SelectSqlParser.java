@@ -1,7 +1,6 @@
 package com.auth.util;
 
 import com.auth.common.Contant;
-import com.auth.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +22,8 @@ public class SelectSqlParser {
      */
     private static final String END_SIGNAL = "ENDOFSQL";
 
+    public static final String SUB_SQL_SIGNAL = "#sub_sql#";
+
     /**
      * select 关键字 前面的内容
      */
@@ -36,7 +37,7 @@ public class SelectSqlParser {
     /**
      * #sub_sql# 倆遍要加空格，否则可能出现 select * from() => select * from#sub_sql#，导致后面无法解析
      */
-    private static final String SUB_SQL = Contant.BLANK + "#sub_sql#" + Contant.BLANK;
+    private static final String SUB_SQL = Contant.BLANK + SUB_SQL_SIGNAL + Contant.BLANK;
 
     /**
      * 原始Sql语句
@@ -122,6 +123,10 @@ public class SelectSqlParser {
                 }
             }
         }
+    }
+
+    public List<SubSql> getSubSqlList() {
+        return this.subSqlList;
     }
 
     private String fullSubSql(String sql) {
@@ -349,13 +354,23 @@ public class SelectSqlParser {
         }
     }
 
-    private class SubSql {
+    public class SubSql {
+        //包含括号的sql
         String oldSql;
+        //去除括号的sql
         String subSql;
 
         public SubSql(String subSql) {
             this.oldSql = subSql;
             this.subSql = this.oldSql.substring(1, this.oldSql.length() - 1);
+        }
+
+        public String getSubSql() {
+            return subSql;
+        }
+
+        public String getOldSql() {
+            return oldSql;
         }
     }
 }
