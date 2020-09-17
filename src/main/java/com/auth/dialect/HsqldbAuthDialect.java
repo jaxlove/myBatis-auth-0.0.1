@@ -44,7 +44,7 @@ public class HsqldbAuthDialect implements DialectHandler {
 
     @Override
     public String selectSufHandler(String sql) {
-        return pageHelperPreSqlThread + "(" + sql + ")" + pageHelperSufSqlThread.get();
+        return pageHelperPreSqlThread.get() + "(" + sql + ")" + pageHelperSufSqlThread.get();
     }
 
     @Override
