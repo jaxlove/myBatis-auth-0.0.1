@@ -47,9 +47,13 @@ public class OracleAuthDialect implements DialectHandler {
     @Override
     public String selectSufHandler(String sql) {
         sql = pageHelperPreSqlThread.get() + sql + pageHelperSufSqlThread.get();
+        return sql;
+    }
+
+    @Override
+    public void clear() {
         pageHelperPreSqlThread.remove();
         pageHelperSufSqlThread.remove();
-        return sql;
     }
 
     @Override

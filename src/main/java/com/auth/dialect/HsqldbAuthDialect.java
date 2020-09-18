@@ -1,6 +1,7 @@
 package com.auth.dialect;
 
 import com.auth.util.SelectSqlParser;
+import com.auth.util.StringUtils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,7 +45,14 @@ public class HsqldbAuthDialect implements DialectHandler {
 
     @Override
     public String selectSufHandler(String sql) {
-        return pageHelperPreSqlThread.get() + "(" + sql + ")" + pageHelperSufSqlThread.get();
+        sql = pageHelperPreSqlThread.get() + sql + pageHelperSufSqlThread.get();
+        return sql;
+    }
+
+    @Override
+    public void clear() {
+        pageHelperPreSqlThread.remove();
+        pageHelperSufSqlThread.remove();
     }
 
     @Override

@@ -9,4 +9,6 @@ public interface PageHelperHanlder {
     String removePagehelperCountSql(String sql) throws AuthException;
 
     String selectSufHandler(String sql);
+
+    void clear();
 }

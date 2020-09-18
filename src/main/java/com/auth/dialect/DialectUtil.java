@@ -24,8 +24,16 @@ public class DialectUtil {
 
     static {
         //注册别名
+        registerDialectAlias("hsqldb", HsqldbAuthDialect.class);
+        registerDialectAlias("h2", HsqldbAuthDialect.class);
         registerDialectAlias("postgresql", HsqldbAuthDialect.class);
+        registerDialectAlias("phoenix", HsqldbAuthDialect.class);
+
         registerDialectAlias("oracle", OracleAuthDialect.class);
+        //达梦数据库,https://github.com/mybatis-book/book/issues/43
+        registerDialectAlias("dm", OracleAuthDialect.class);
+        //阿里云PPAS数据库,https://github.com/pagehelper/Mybatis-PageHelper/issues/281
+        registerDialectAlias("edb", OracleAuthDialect.class);
 //        registerDialectAlias("hsqldb", HsqldbDialect.class);
 //        registerDialectAlias("h2", HsqldbDialect.class);
 

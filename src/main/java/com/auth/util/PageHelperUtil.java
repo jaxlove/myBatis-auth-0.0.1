@@ -31,7 +31,9 @@ public class PageHelperUtil {
         if (!inited.getAndSet(true)) {
             init();
         }
-        return pageHelperHanlder.selectSufHandler(sql);
+        String endHandlerSql = pageHelperHanlder.selectSufHandler(sql);
+        pageHelperHanlder.clear();
+        return endHandlerSql;
     }
 
     /**
