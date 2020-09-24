@@ -93,7 +93,6 @@ public class AuthPlugin implements Interceptor {
             throw new UnKownDialect("未知dialect：" + dialect);
         }
         Configuration.setDialect(dialect);
-        Configuration.setEmptySql(DialectUtil.getDialect(dialect).getEmptySql());
         String sqlType = properties.getProperty("sqlType");
         if (AuthType.COMPLEX.toString().equalsIgnoreCase(sqlType)) {
             Configuration.setAuthType(AuthType.COMPLEX);
@@ -144,7 +143,7 @@ public class AuthPlugin implements Interceptor {
         ScopeSql authSql;
         if (autoAppend()) {
             //todo 每次都要拼接，影响效率，可学习pagehelper，生成个新的MappedStatement，注入参数，缓存起来
-            authSql = MyBatisAuthUtils.getAuthSql(metaObject.getValue("sql").toString(), mappedStatementId, parameterObject);
+            authSql = MyBatisAuthUtils.getAuthSql(metaObject.getValue("sql").toString(), ms.getResultMaps(), mappedStatementId, parameterObject);
         } else {
             authSql = new ScopeSql(Scope.ALL, metaObject.getValue("sql").toString());
         }

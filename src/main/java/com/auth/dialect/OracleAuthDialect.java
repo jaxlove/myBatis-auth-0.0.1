@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
  * @description: oracle pagehelper处理类
  * @date 2020/9/4 11:12
  */
-public class OracleAuthDialect implements DialectHandler {
+public class OracleAuthDialect extends AbstractDialectHandler {
 
     //分页sql的前面的sql
     private static ThreadLocal<String> pageHelperPreSqlThread = ThreadLocal.withInitial(() -> "");
@@ -57,7 +57,11 @@ public class OracleAuthDialect implements DialectHandler {
     }
 
     @Override
-    public String getEmptySql() {
-        return "select 0 from dual where 1=0";
+    String doGetEmptySql(Class class_) {
+        if (Number.class.isAssignableFrom(class_)) {
+            return "select 0 from dual";
+        } else {
+            return "select 0 from dual where 1=0";
+        }
     }
 }

@@ -23,11 +23,6 @@ public class Configuration {
     private static String dialect = null;
 
     /**
-     * 空sql
-     */
-    private static String EMPTY_SQL = "select 0 from dual where 0=1";
-
-    /**
      * 是否自动拼接权限sql
      */
     private static Boolean autoAppendAuth = false;
@@ -86,14 +81,6 @@ public class Configuration {
 
     public static void setInitSuccess(boolean initSuccess) {
         Configuration.initSuccess = initSuccess;
-    }
-
-    public static String getEmptySql() {
-        return EMPTY_SQL;
-    }
-
-    public static void setEmptySql(String emptySql) {
-        EMPTY_SQL = emptySql;
     }
 
     public static String getDialect() {

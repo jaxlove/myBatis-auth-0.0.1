@@ -31,6 +31,6 @@ package com.auth.dialect;
  */
 public interface AuthDialectHandler {
 
-    String getEmptySql();
+    String getEmptySql(Class class_);
 
 }

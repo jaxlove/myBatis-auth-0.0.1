@@ -1,6 +1,7 @@
 package com.auth.dialect;
 
 
+import com.auth.plugin.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +61,10 @@ public class DialectUtil {
 //        registerDialectAlias("edb", OracleDialect.class);
 //        //神通数据库
 //        registerDialectAlias("oscar", MySqlDialect.class);
+    }
+
+    public static DialectHandler getDialect() {
+        return getDialect(Configuration.getDialect());
     }
 
     public static DialectHandler getDialect(String alias) {

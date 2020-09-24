@@ -1,7 +1,6 @@
 package com.auth.dialect;
 
 import com.auth.util.SelectSqlParser;
-import com.auth.util.StringUtils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -11,7 +10,7 @@ import java.util.regex.Pattern;
  * @description: pgsql pagehelper处理类
  * @date 2020/9/4 11:12
  */
-public class HsqldbAuthDialect implements DialectHandler {
+public class HsqldbAuthDialect extends AbstractDialectHandler {
 
     //分页sql的前面的sql
     private static ThreadLocal<String> pageHelperPreSqlThread = ThreadLocal.withInitial(() -> "");
@@ -56,8 +55,12 @@ public class HsqldbAuthDialect implements DialectHandler {
     }
 
     @Override
-    public String getEmptySql() {
-        return "select 0 where 1=0";
+    String doGetEmptySql(Class class_) {
+        if (Number.class.isAssignableFrom(class_)) {
+            return "select 0";
+        } else {
+            return "select 0 where 0=1";
+        }
     }
 
 }

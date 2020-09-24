@@ -2,12 +2,16 @@ package com.auth.entity;
 
 import com.auth.authSql.ScopeSql;
 
+import java.io.Serializable;
+
 /**
  * @author wangdejun
  * @description: 权限信息
  * @date 2020/7/27 18:29
  */
-public class BaseAuthInfo {
+public class BaseAuthInfo implements Serializable {
+
+    private static final long serialVersionUID = -45361225084251859L;
 
     /**
      * 是否自动拼接权限sql

@@ -1,11 +1,13 @@
 package com.auth.util;
 
 import com.auth.authSql.*;
+import com.auth.dialect.DialectUtil;
 import com.auth.entity.BaseAuthInfo;
 import com.auth.entity.SimpleAuthInfo;
 import com.auth.exception.AuthException;
 import com.auth.exception.UnknownAuthTypeException;
 import com.auth.plugin.Configuration;
+import org.apache.ibatis.mapping.ResultMap;
 
 import java.util.List;
 import java.util.Properties;
@@ -17,7 +19,7 @@ import java.util.Properties;
  */
 public class AuthSqlUtils {
 
-    public static ScopeSql getAuthSql(String sql, String mappedStatementId, Object parameterObject) throws AuthException {
+    public static ScopeSql getAuthSql(String sql, List<ResultMap> resultMaps, String mappedStatementId, Object parameterObject) throws AuthException {
         BaseAuthInfo authInfo = AuthHelper.getCurSearchInfo();
         //获取权限where条件
         ScopeSql authWhere = authInfo.getAuthScopSql();
@@ -28,7 +30,8 @@ public class AuthSqlUtils {
             case ALL:
                 return new ScopeSql(Scope.ALL, sql);
             case NONE:
-                return new ScopeSql(Scope.NONE, Configuration.getEmptySql());
+                Class resultType = resultMaps.size() == 1 ? resultMaps.get(0).getType() : null;
+                return new ScopeSql(Scope.NONE, DialectUtil.getDialect().getEmptySql(resultType));
         }
         sql = PageHelperUtil.getNativeSql(sql, mappedStatementId, parameterObject);
         SelectSqlParser selectSqlParser = new SelectSqlParser(sql);
