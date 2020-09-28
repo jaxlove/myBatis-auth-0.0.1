@@ -13,7 +13,6 @@ import java.util.List;
  */
 public class MyBatisAuthUtils {
 
-    //todo 如果返回类型是int等基本类型，不可返回null，应返回 0，待实现
     public static ScopeSql getAuthSql(String sql, List<ResultMap> resultMaps, String mappedStatementId, Object parameterObject) throws AuthException {
         return AuthSqlUtils.getAuthSql(sql, resultMaps, mappedStatementId, parameterObject);
     }

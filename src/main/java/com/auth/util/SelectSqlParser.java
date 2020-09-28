@@ -63,9 +63,7 @@ public class SelectSqlParser {
     public SelectSqlParser(String sql) {
         //注意sql中，可能包含着myBatis中的各种表达式，不可以转为大写/小写
         this.originalSql = sql;
-        //去除多余空格
-        simpleSql = sql.trim().replaceAll("\\s+", Contant.BLANK) + Contant.BLANK + END_SIGNAL;
-        //去除带有括号的子查询
+        //获取简单版sql->去除带有括号的子查询
         setSimpleSql();
         initializeSegments();
         splitSql2Segment();
@@ -104,6 +102,7 @@ public class SelectSqlParser {
      * @return
      */
     public void setSimpleSql() {
+        simpleSql = originalSql.trim().replaceAll("\\s+", Contant.BLANK) + Contant.BLANK + END_SIGNAL;
         int start = 0;
         int startFlag = 0;
         int endFlag = 0;
